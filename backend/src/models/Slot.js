@@ -9,6 +9,10 @@ const SlotSchema=new mongoose.Schema(
    Time:{
     type:Date
    },
+   price:{
+    type:Number,
+    required:true
+   },
    Patient:{
     type:mongoose.Schema.Types.ObjectId,
     ref:"User"
