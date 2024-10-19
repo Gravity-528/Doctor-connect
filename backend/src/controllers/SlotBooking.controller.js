@@ -7,6 +7,7 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET 
 });
 
+
 const bookSlot=asyncHandler(async(req,res)=>{
      
      const { DoctorId, time } = req.body;   
@@ -14,7 +15,7 @@ const bookSlot=asyncHandler(async(req,res)=>{
      const locked=await Slot.findOneAndUpdate({Doctor:DoctorId,Time:time,check:"available"},{$set:{check:"unavailable"}},{new:true})
      if(!locked){
       //  await session.abortTransaction();
-       res.status(201).json("slot is already booked try some another slot")
+      res.status(201).json("slot is already booked or time has passed please try some another slot");
      }
      const session = await Slot.startSession();
      session.startTransaction();
