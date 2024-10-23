@@ -3,22 +3,22 @@ import mongoose from "mongoose";
 const UserSchema=new mongoose.Schema({
     name:{
         type:String,
-        required:[True,"name is required"]
+        required:[true,"name is required"]
     },
     username:{
         type:String,
-        required:[True,"username is required"]
+        required:[true,"username is required"]
     },
     password:{
         type:String,
-        required:[True,"password is required"]
+        required:[true,"password is required"]
     },
     refreshToken: {
         type: String
     },
     email:{
        type:String,
-       required:[True,"email is required"]
+       required:[true,"email is required"]
     },
     Doctors:[{
         type:mongoose.Schema.Types.ObjectId,
@@ -54,4 +54,4 @@ UserSchema.methods.jwtRefreshToken = function () {
     });
 }
 
-export default User=mongoose.model('User',UserSchema);
+export const User =mongoose.model('User',UserSchema);

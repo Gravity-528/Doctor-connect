@@ -2,6 +2,7 @@ import Slot from "../models/Slot.js"
 import razorpay from "razorpay"
 import asyncHandler from "../utils/asyncHandler.js"
 
+
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID, 
   key_secret: process.env.RAZORPAY_KEY_SECRET 

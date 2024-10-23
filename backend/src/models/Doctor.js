@@ -8,15 +8,15 @@ const DoctorSchema=new mongoose.Schema(
    },
    email:{
     type:String,
-    required:[True,"email is required"]
+    required:[true,"email is required"]
    },
    username:{
     type:String,
-    required:[True,"username is required"]
+    required:[true,"username is required"]
    },
    password:{
     type:String,
-    required:[True,"password is required"]
+    required:[true,"password is required"]
    },
    
    Patients:[{
@@ -25,17 +25,17 @@ const DoctorSchema=new mongoose.Schema(
    }]
 },{timestamps:true})
 
-UserSchema.pre("save", async function (next) {
+DoctorSchema.pre("save", async function (next) {
    if (!this.isModified("password")) { return next(); }
    this.password = await bcrypt.hash(this.password, 10);
    next();
 });
 
-UserSchema.methods.isPasswordTrue = async function (password) {
+DoctorSchema.methods.isPasswordTrue = async function (password) {
    return await bcrypt.compare(password, this.password);
 }
 
-UserSchema.methods.jwtAccessToken = function () {
+DoctorSchema.methods.jwtAccessToken = function () {
    return jwt.sign({
        _id: this._id,
        username: this.username,
@@ -45,7 +45,7 @@ UserSchema.methods.jwtAccessToken = function () {
    });
 }
 
-UserSchema.methods.jwtRefreshToken = function () {
+DoctorSchema.methods.jwtRefreshToken = function () {
    return jwt.sign({
        _id: this._id
    }, process.env.REFRESH_TOKEN_SECRET, {
@@ -53,4 +53,4 @@ UserSchema.methods.jwtRefreshToken = function () {
    });
 }
 
-export default Doctor=mongoose.model("Doctor",DoctorSchema);
+export const Doctor=mongoose.model("Doctor",DoctorSchema);

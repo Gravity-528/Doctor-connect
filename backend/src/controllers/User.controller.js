@@ -1,6 +1,6 @@
 import {asyncHandler} from "../utils/asyncHandler.js"
 import {ApiError} from "../utils/ApiError.js"
-import { User } from "../models/User.js";
+import {User}  from "../models/User.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 
 const generateAccessAndRefreshTokens= async(userid)=>{

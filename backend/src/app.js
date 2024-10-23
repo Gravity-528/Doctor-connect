@@ -14,10 +14,10 @@ app.use(express.urlencoded({ limit: "22kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
-import UserRoutes from "../src/routes/User.Route"
+import UserRoutes from "../src/routes/User.Route.js"
 app.use("/api/v1/user",UserRoutes);
 
-import DoctorRoutes from "../src/routes/Doctor.Route"
+import DoctorRoutes from "../src/routes/Doctor.Route.js"
 app.use("/api/v1/doctor",DoctorRoutes);
 
 export { app };
