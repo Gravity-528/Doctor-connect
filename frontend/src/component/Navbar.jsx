@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,14 +12,23 @@ const Navbar = () => {
               Mentors Connect
             </a>
           </div>
-          <div className="hidden md:flex space-x-6">
-            <a href="/" className="text-gray-700 hover:text-gray-900 px-4 py-2 mt-3 rounded-md text-base font-medium">
+          <div className="hidden md:flex space-x-6 items-center">
+            <a
+              href="/"
+              className="text-gray-700 hover:text-gray-900 px-4 py-2 rounded-md text-base font-medium transition duration-300"
+            >
               Find Doctors
             </a>
-            <a href="/about" className="text-gray-700 hover:text-gray-900 px-4 py-2 mt-3 rounded-md text-base font-medium">
+            <a
+              href="/about"
+              className="text-gray-700 hover:text-gray-900 px-4 py-2 rounded-md text-base font-medium transition duration-300"
+            >
               Your Doctors
             </a>
-            <a href="/" className="text-gray-700 hover:text-gray-900 px-4 py-2 mt-3 rounded-md text-base font-medium">
+            <a
+              href="/"
+              className="text-gray-700 hover:text-gray-900 px-4 py-2 rounded-md text-base font-medium transition duration-300"
+            >
               Logout
             </a>
           </div>
@@ -31,12 +40,34 @@ const Navbar = () => {
               className="text-gray-800 hover:text-gray-600 focus:outline-none"
             >
               {isOpen ? (
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               ) : (
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h16m-7 6h7"
+                  />
                 </svg>
               )}
             </button>
@@ -48,16 +79,28 @@ const Navbar = () => {
       {isOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a href="/" className="text-gray-700 hover:text-gray-900 block px-4 py-2 rounded-md text-base font-medium">
+            <a
+              href="/"
+              className="text-gray-700 hover:bg-gray-100 block px-4 py-2 rounded-md text-base font-medium transition duration-300"
+            >
               Home
             </a>
-            <a href="/about" className="text-gray-700 hover:text-gray-900 block px-4 py-2 rounded-md text-base font-medium">
+            <a
+              href="/about"
+              className="text-gray-700 hover:bg-gray-100 block px-4 py-2 rounded-md text-base font-medium transition duration-300"
+            >
               About
             </a>
-            <a href="/services" className="text-gray-700 hover:text-gray-900 block px-4 py-2 rounded-md text-base font-medium">
+            <a
+              href="/services"
+              className="text-gray-700 hover:bg-gray-100 block px-4 py-2 rounded-md text-base font-medium transition duration-300"
+            >
               Services
             </a>
-            <a href="/contact" className="text-gray-700 hover:text-gray-900 block px-4 py-2 rounded-md text-base font-medium">
+            <a
+              href="/contact"
+              className="text-gray-700 hover:bg-gray-100 block px-4 py-2 rounded-md text-base font-medium transition duration-300"
+            >
               Contact
             </a>
           </div>

@@ -10,6 +10,10 @@ const DoctorSchema=new mongoose.Schema(
     type:String,
     required:[true,"email is required"]
    },
+   qualification:{
+      type:String,
+      required:[true,"qualification is a required field"]
+   },
    username:{
     type:String,
     required:[true,"username is required"]
