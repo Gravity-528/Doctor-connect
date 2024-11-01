@@ -22,11 +22,14 @@ const DoctorSchema=new mongoose.Schema(
     type:String,
     required:[true,"password is required"]
    },
-   
-   Patients:[{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Slot"
-   }]
+   ToAttendSlot:[{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:'Slot'
+   }],
+   // Patients:[{
+   //  type:mongoose.Schema.Types.ObjectId,
+   //  ref:"Slot"
+   // }]
 },{timestamps:true})
 
 DoctorSchema.pre("save", async function (next) {

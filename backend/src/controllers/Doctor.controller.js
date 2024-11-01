@@ -2,6 +2,7 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 import {ApiError} from "../utils/ApiError.js"
 import { Doctor}  from "../models/Doctor.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
+import Slot from "../models/Slot.js";
 
 const generateAccessAndRefreshTokens= async(doctorid)=>{
     try {
@@ -59,6 +60,18 @@ const registerDoctor=asyncHandler(async(req,res)=>{
     }
 
     //return to database
+    const Slot1=await Slot.create({
+        Doctor:doctor.id,
+        Time:"3:00 pm",
+        price:250,
+        check:"unavailable"
+    });
+    const Slot2=await Slot.create({
+        Doctor:doctor.id,
+        Time:"9:00 pm",
+        price:250,
+        check:"unavailable"
+    });
     return res.status(201).json(
        new ApiResponse(201,check,"user registered successfully")
     )
@@ -167,6 +180,19 @@ const editDoctor=asyncHandler(async(req,res)=>{
             new:true
         });
         res.status(201).json(new ApiResponse(201,updateFind,"user data is updated"));
+});
+
+const SlotAttend=asyncHandler(async(req,res)=>{
+     const doctor=req.doctor._id;
+     try{
+     const FindSlot=await Slot.find({Doctor:doctor}).populate('ToAttendSlot');
+
+     return res.status(200).json({msg:"Slot fetched Successfully",data:FindSlot});
+     }catch(err){
+        console.error("some error is here",err);
+     }
+
+
 })
 
-export {registerDoctor,LoginDoctor,LogoutDoctor,refreshAccesToken,editDoctor}
+export {registerDoctor,LoginDoctor,LogoutDoctor,refreshAccesToken,editDoctor,SlotAttend}

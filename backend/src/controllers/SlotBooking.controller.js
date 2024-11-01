@@ -1,6 +1,8 @@
 import Slot from "../models/Slot.js"
 import razorpay from "razorpay"
 import asyncHandler from "../utils/asyncHandler.js"
+import { User } from "../models/User.js";
+import { Doctor } from "../models/Doctor.js";
 
 
 const razorpay = new Razorpay({
@@ -8,11 +10,19 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET 
 });
 
+const fetchSlot=asyncHandler(async(req,res)=>{
+  try{
+     const AllSlot=await Slot.find();
 
+     return res.status(200).json({data:AllSlot,msg:"All slots fetched successfully"});
+  }catch(err){
+    console.error("some error is here",err);
+  }
+})
 const bookSlot=asyncHandler(async(req,res)=>{
      
      const { DoctorId, time } = req.body;   
-     
+     const {userId}=req.users;
      const locked=await Slot.findOneAndUpdate({Doctor:DoctorId,Time:time,check:"available"},{$set:{check:"unavailable"}},{new:true})
      if(!locked){
       //  await session.abortTransaction();
@@ -30,7 +40,14 @@ const bookSlot=asyncHandler(async(req,res)=>{
         payment_capture: 1 
     };
     const order = await razorpay.orders.create(options);
-
+    const findSlot=await Slot.findOneAndUpdate({Doctor:DoctorId,Time:time},{$set:{Patient:userId}},{new:true});
+    const updateUser=await User.findOneAndUpdate({_id:userId},{$push:{YourSlot:findSlot._id}},{new:true});
+    const updateDoctor=await Doctor.findOneAndUpdate({_id:DoctorId},{$push:{ToAttendSlot:findSlot._id}},{new:true});
+    
+    if(!findSlot){
+      return res.status(500).json({msg:"some internal error is here ,please try again later"});
+      await session.abortTransaction();
+    }
        await session.commitTransaction();
        return res.status(200).json({ orderId: order.id, amount });
      }catch(err){
@@ -43,4 +60,4 @@ const bookSlot=asyncHandler(async(req,res)=>{
      }
 })
 
-export {bookSlot};
+export {bookSlot,fetchSlot};

@@ -30,10 +30,10 @@ export const PeerProvider=(props)=>{
     const getCam=async()=>{
         const streams=await navigator.mediaDevices.getUserMedia({audio:true,video:true});
 
-        
+        return streams;
     }
    return(
-    <PeerContext.Provider value={{peer,SendOffer,RecieveAnswer}}>
+    <PeerContext.Provider value={{peer,SendOffer,RecieveAnswer,getCam}}>
         {props.children}
     </PeerContext.Provider>
    )

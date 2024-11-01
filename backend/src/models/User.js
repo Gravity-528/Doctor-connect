@@ -20,10 +20,14 @@ const UserSchema=new mongoose.Schema({
        type:String,
        required:[true,"email is required"]
     },
-    Doctors:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Slot'
-    }]
+    YourSlot:[{
+       type:mongoose.Schema.Types.ObjectId,
+       ref:'Slot'
+    }],
+    // Doctors:[{
+    //     type:mongoose.Schema.Types.ObjectId,
+    //     ref:'Slot'
+    // }]
 },{timestamps:true})
 
 UserSchema.pre("save", async function (next) {

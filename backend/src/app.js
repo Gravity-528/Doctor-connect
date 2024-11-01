@@ -20,4 +20,7 @@ app.use("/api/v1/user",UserRoutes);
 import DoctorRoutes from "../src/routes/Doctor.Route.js"
 app.use("/api/v1/doctor",DoctorRoutes);
 
+import SlotRoutes from "../src/routes/Slot.Route.js"
+app.use("/api/v1/Slot",SlotRoutes);
+
 export { app };
