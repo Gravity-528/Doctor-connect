@@ -14,6 +14,10 @@ const DoctorSchema=new mongoose.Schema(
       type:String,
       required:[true,"qualification is a required field"]
    },
+   image:{
+      type:String,
+      required:[true,"your image is required"]
+   },
    username:{
     type:String,
     required:[true,"username is required"]
