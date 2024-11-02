@@ -4,6 +4,7 @@ import Hero from './component/Hero'
 import Navbar from './component/Navbar'
 import SlotCard from './component/SlotCard'
 import Video from './component/Video'
+import YourSlotCard from './component/YourSlotCard'
 import FindDoctor from './Pages/FindDoctor'
 import LandingPage from './Pages/LandingPage'
 import { SocketProvider } from './Providers/Socket'
@@ -19,7 +20,8 @@ function App() {
       {/* <Navbar/> */}
       {/* <DoctorCard/> */}
       {/* <FindDoctor/> */}
-      <Video/>
+      {/* <Video/> */}
+      {<YourSlotCard/>}
       </PeerProvider>
       </SocketProvider>
       

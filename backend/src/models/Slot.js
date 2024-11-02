@@ -27,4 +27,4 @@ const SlotSchema=new mongoose.Schema(
    
 },{timestamps:true})
 
-export default Slot=mongoose.model("Doctor",SlotSchema);
+export default Slot=mongoose.model("Slot",SlotSchema);

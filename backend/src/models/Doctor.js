@@ -26,6 +26,10 @@ const DoctorSchema=new mongoose.Schema(
     type:String,
     required:[true,"password is required"]
    },
+   DoctorSlot:[{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:'Slot'
+   }],
    ToAttendSlot:[{
       type:mongoose.Schema.Types.ObjectId,
       ref:'Slot'

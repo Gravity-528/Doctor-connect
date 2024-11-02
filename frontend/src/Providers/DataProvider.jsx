@@ -8,9 +8,11 @@ export const useData=()=>{
 }
 
 export const ReactProvider=({children})=>{
+
     const [UserSlot,setUserSlot]=useState({});
     const [DoctorSlot,setDoctorSlot]=useState({});
     const [AllSlot,setAllSlot]=useState({});
+    const [Doctor,setDoctor]=useState({});
 
     const GetDoctorSlot=async()=>{
         try{
@@ -20,7 +22,14 @@ export const ReactProvider=({children})=>{
             console.error("error in fetching OtherSlot",err);
         }
     }
-
+    const GetAllDoctor=async()=>{
+        try {
+            const response=await axios.get('https://localhost:8000/api/v1/doctor/doctorSlot',{withCredentials:true});
+            setDoctor(response.data);
+        } catch (error) {
+            console.error("error in fetching the doctor",error);
+        }
+    }
     const GetUserSlot=async()=>{
         try{
             const YourSlot=await axios.get('https://localhost:8000/api/v1/user/getSlot',{withCredentials:true});
@@ -44,11 +53,12 @@ export const ReactProvider=({children})=>{
           await GetUserSlot();
           await GetDoctorSlot();
           await GetAllSlot();
+          await GetAllDoctor();
         }
         fetch();
     },[]);
     return(
-    <DataContext.Provider value={{UserSlot,setUserSlot,DoctorSlot,setDoctorSlot,AllSlot,setAllSlot}}>
+    <DataContext.Provider value={{UserSlot,setUserSlot,DoctorSlot,setDoctorSlot,AllSlot,setAllSlot,Doctor,setDoctor}}>
        {children}
     </DataContext.Provider>
     )

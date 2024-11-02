@@ -191,8 +191,18 @@ const SlotAttend=asyncHandler(async(req,res)=>{
      }catch(err){
         console.error("some error is here",err);
      }
-
-
 })
 
-export {registerDoctor,LoginDoctor,LogoutDoctor,refreshAccesToken,editDoctor,SlotAttend}
+const FindDoctorById=asyncHandler(async(req,res)=>{
+    const {id}=req.body;
+    try{
+    const FindDoctor=await Doctor.findById(id).populate('DoctorSlot');
+    return res.status(200).json({msg:"findDoctor by id FEtched successfully",data:FindDoctor});
+    }catch(err){
+        console.error(err);
+        return res.status(500).json({msg:"error in fetching DoctorById",err});
+    }
+})
+
+
+export {registerDoctor,LoginDoctor,LogoutDoctor,refreshAccesToken,editDoctor,SlotAttend,FindDoctorById}
