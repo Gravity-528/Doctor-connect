@@ -1,14 +1,14 @@
-import Slot from "../models/Slot.js"
-import razorpay from "razorpay"
-import asyncHandler from "../utils/asyncHandler.js"
+import {Slot} from "../models/Slot.js"
+import Razorpay from "razorpay"
+import {asyncHandler} from "../utils/asyncHandler.js"
 import { User } from "../models/User.js";
 import { Doctor } from "../models/Doctor.js";
 
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID, 
-  key_secret: process.env.RAZORPAY_KEY_SECRET 
-});
+// const razorpay = new Razorpay({
+//   key_id: process.env.RAZORPAY_KEY_ID, 
+//   key_secret: process.env.RAZORPAY_KEY_SECRET 
+// });
 
 const fetchSlot=asyncHandler(async(req,res)=>{
   try{

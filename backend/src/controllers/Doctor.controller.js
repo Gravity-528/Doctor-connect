@@ -2,7 +2,7 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 import {ApiError} from "../utils/ApiError.js"
 import { Doctor}  from "../models/Doctor.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
-import Slot from "../models/Slot.js";
+import {Slot} from "../models/Slot.js";
 
 const generateAccessAndRefreshTokens= async(doctorid)=>{
     try {

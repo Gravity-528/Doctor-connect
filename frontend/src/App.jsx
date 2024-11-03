@@ -1,3 +1,4 @@
+import { BrowserRouter, Routes ,Route} from 'react-router-dom'
 import './App.css'
 import DoctorCard from './component/DoctorCard'
 import Hero from './component/Hero'
@@ -16,12 +17,17 @@ function App() {
     <>
       <SocketProvider>
       <PeerProvider>
+      <BrowserRouter>
+      <Routes>
+      <Route path="/" element={<LandingPage/>}/>
       {/* <LandingPage/> */}
       {/* <Navbar/> */}
       {/* <DoctorCard/> */}
       {/* <FindDoctor/> */}
       {/* <Video/> */}
-      {<YourSlotCard/>}
+      {/* <YourSlotCard/> */}
+      </Routes>
+      </BrowserRouter>
       </PeerProvider>
       </SocketProvider>
       
