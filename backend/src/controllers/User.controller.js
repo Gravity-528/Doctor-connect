@@ -184,4 +184,24 @@ const FetchBookedSlot=asyncHandler(async(req,res)=>{
     }
 })
 
-export {registerUser,LoginUser,LogoutUser,refreshAccesToken,editUser,FetchBookedSlot};
+const FetchDoctorByUserName=asyncHandler(async(req,res)=>{
+    const {username}=req.body;
+     const FindDoctor=await Doctor.find({username});
+
+     return res.status(200).json({msg:"DoctorId fetched successfully",data:FindDoctor._id});
+})
+
+const GetUserById=asyncHandler(async(req,res)=>{
+   const user=req.user;
+   try{
+   if(!user){
+    return res.status(401).json({msg:"error is here in fetching the user by id"});
+   }
+   return res.status(200).json({msg:"fetched the user by id successfully",user});
+  }catch(err){
+    console.error("error is here in fetching the user by id",err);
+    return res.status(500).json({msg:"error is here in fetching the user by id"});
+  }
+})
+
+export {registerUser,LoginUser,LogoutUser,refreshAccesToken,editUser,FetchBookedSlot,FetchDoctorByUserName,GetUserById};

@@ -3,7 +3,7 @@ import http from "http";
 import cors from "cors";
 import connectDb from "./database/index.js";
 import { app } from "./app.js";
-import {Server} from "socket.io"
+import {Server} from "socket.io";
 
 
 

@@ -13,6 +13,16 @@ export const ReactProvider=({children})=>{
     const [DoctorSlot,setDoctorSlot]=useState({});
     const [AllSlot,setAllSlot]=useState({});
     const [Doctor,setDoctor]=useState({});
+    const [userById,setUserById]=useState({});
+
+    const GetUserId=async()=>{
+        try {
+            const response=await axios.get('https://localhost:8000/api/v1/user/fetchById',{withCredentials:true});
+            setUserById(response.data);
+        } catch (error) {
+            console.error("some frontend error in fetching userById",error);
+        }
+    }
 
     const GetDoctorSlot=async()=>{
         try{
@@ -54,11 +64,12 @@ export const ReactProvider=({children})=>{
           await GetDoctorSlot();
           await GetAllSlot();
           await GetAllDoctor();
+          await GetUserId();
         }
         fetch();
     },[]);
     return(
-    <DataContext.Provider value={{UserSlot,setUserSlot,DoctorSlot,setDoctorSlot,AllSlot,setAllSlot,Doctor,setDoctor}}>
+    <DataContext.Provider value={{UserSlot,setUserSlot,DoctorSlot,setDoctorSlot,AllSlot,setAllSlot,Doctor,setDoctor,userById,setUserById}}>
        {children}
     </DataContext.Provider>
     )
