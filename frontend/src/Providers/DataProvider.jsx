@@ -37,6 +37,25 @@ export const ReactProvider=({children})=>{
             console.error("error in login in frontend part",error);
         }
     }
+    const LoginDoctorGet=async(username,password)=>{
+        try{
+           const response=await axios.post("https://localhost:8000/api/v1/doctor/loginDoctor",{username,password},{withCredentials:true});
+           const value=response.val;
+           setIsAuth({valid:value.valid,role:value.role});
+        }catch(error){
+            console.error("error in login in frontend part",error);
+        }
+    }
+    const RegisterDoctorGet=async(name,username,password,email)=>{
+        try {
+            const response=await axios.post("https://localhost:8000/api/v1/doctor/registerDoctor",{name,username,password,email},{withCredentials:true});
+            if(!response){
+                console.error("error in registering user try again");
+            }
+        } catch (error) {
+            console.error("error in registering the user try again",error);
+        }
+    }
     const GetUserId=async()=>{
         try {
             const response=await axios.get('https://localhost:8000/api/v1/user/fetchById',{withCredentials:true});
@@ -91,7 +110,7 @@ export const ReactProvider=({children})=>{
         fetch();
     },[]);
     return(
-    <DataContext.Provider value={{UserSlot,setUserSlot,DoctorSlot,setDoctorSlot,AllSlot,setAllSlot,Doctor,setDoctor,userById,setUserById,LoginUserGet,isAuth,setIsAuth,RegisterUserGet}}>
+    <DataContext.Provider value={{UserSlot,setUserSlot,DoctorSlot,setDoctorSlot,AllSlot,setAllSlot,Doctor,setDoctor,userById,setUserById,LoginUserGet,isAuth,setIsAuth,RegisterUserGet,LoginDoctorGet,RegisterDoctorGet}}>
        {children}
     </DataContext.Provider>
     )

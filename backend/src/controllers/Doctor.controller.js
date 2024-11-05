@@ -79,15 +79,15 @@ const registerDoctor=asyncHandler(async(req,res)=>{
 
 const LoginDoctor=asyncHandler(async(req,res)=>{
     
-    const {username,password,email}=req.body
+    const {username,password}=req.body
  
-    if(!username || !password || !email){
+    if(!username || !password){
      console.log(req.body);
      throw new ApiError(401,"all details are missing");
     }
  
     const exist=await Doctor.findOne({
-     $or:[{username},{email}]
+     $or:[{username}]
     })
  
     if(!exist){
@@ -111,11 +111,16 @@ const LoginDoctor=asyncHandler(async(req,res)=>{
        httpOnly:true,
        secure:true
     }
+
+    const val={
+        valid:true,
+        role:"doctor"
+    }
  
     return res.status(200)
     .cookie("accessToken",accessToken,options)
     .cookie("refreshToken",refreshToken,options)
-    .json(new ApiResponse(200,loggedDetail,"logged successfully"))
+    .json({loggedDetail,msg:"logged successfully",val});
  });
  
  const LogoutDoctor=asyncHandler((req,res)=>{
