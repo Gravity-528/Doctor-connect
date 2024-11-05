@@ -30,10 +30,10 @@ const generateAccessAndRefreshTokens= async(doctorid)=>{
 
 const registerDoctor=asyncHandler(async(req,res)=>{
     
-    const {name,username,password,email}=req.body;
+    const {name,username,password,email,qualification}=req.body;
 
     
-    if(!name || !username || !password || !email){
+    if(!name || !username || !password || !email || !qualification){
         throw new ApiError(400,"all fields required");
     }
 
@@ -50,7 +50,8 @@ const registerDoctor=asyncHandler(async(req,res)=>{
     const doctor=await Doctor.create({
         username,
         password,
-        email
+        email,
+        qualification
     });
 
     const check=await Doctor.findById(doctor._id).select("-password -refreshToken");
@@ -59,18 +60,18 @@ const registerDoctor=asyncHandler(async(req,res)=>{
         throw new ApiError(500,"user has not been registered");
     }
 
-    //return to database
+    
     const Slot1=await Slot.create({
         Doctor:doctor.id,
         Time:"3:00 pm",
         price:250,
-        check:"unavailable"
+        check:"available"
     });
     const Slot2=await Slot.create({
         Doctor:doctor.id,
         Time:"9:00 pm",
         price:250,
-        check:"unavailable"
+        check:"available"
     });
     return res.status(201).json(
        new ApiResponse(201,check,"user registered successfully")

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useData } from '../Providers/DataProvider';
 
 const DoctorRegister = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,8 @@ const DoctorRegister = () => {
     password: '',
   });
 
+  const {RegisterDoctorGet}=useData();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -18,7 +21,7 @@ const DoctorRegister = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    await RegisterDoctorGet(name,username,password,email,qualification);
   };
 
   return (

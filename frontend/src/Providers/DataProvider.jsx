@@ -46,9 +46,9 @@ export const ReactProvider=({children})=>{
             console.error("error in login in frontend part",error);
         }
     }
-    const RegisterDoctorGet=async(name,username,password,email)=>{
+    const RegisterDoctorGet=async(name,username,password,email,qualification)=>{
         try {
-            const response=await axios.post("https://localhost:8000/api/v1/doctor/registerDoctor",{name,username,password,email},{withCredentials:true});
+            const response=await axios.post("https://localhost:8000/api/v1/doctor/registerDoctor",{name,username,password,email,qualification},{withCredentials:true});
             if(!response){
                 console.error("error in registering user try again");
             }
