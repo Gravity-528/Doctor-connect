@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const DoctorLogin = () => {
   const [formData, setFormData] = useState({
@@ -45,6 +46,7 @@ const DoctorLogin = () => {
         >
           Login
         </button>
+        <p>New to website <Link to='/doctorRegister'>Login</Link></p>
       </form>
     </div>
   );

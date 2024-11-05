@@ -31,8 +31,6 @@ const bookSlot=asyncHandler(async(req,res)=>{
      const session = await Slot.startSession();
      session.startTransaction();
      try{
-
-       //transaction logic
        const options = {
         amount: amount * 100, 
         currency: "INR",
@@ -45,8 +43,8 @@ const bookSlot=asyncHandler(async(req,res)=>{
     const updateDoctor=await Doctor.findOneAndUpdate({_id:DoctorId},{$push:{ToAttendSlot:findSlot._id}},{new:true});
     
     if(!findSlot){
-      return res.status(500).json({msg:"some internal error is here ,please try again later"});
       await session.abortTransaction();
+      return res.status(500).json({msg:"some internal error is here ,please try again later"});
     }
        await session.commitTransaction();
        return res.status(200).json({ orderId: order.id, amount });

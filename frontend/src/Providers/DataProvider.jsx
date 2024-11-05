@@ -7,7 +7,7 @@ export const useData=()=>{
     return React.useContext(DataContext);
 }
 
-export const ReactProvider=({children})=>{
+export const DataProvider=({children})=>{
 
     const [UserSlot,setUserSlot]=useState({});
     const [DoctorSlot,setDoctorSlot]=useState({});

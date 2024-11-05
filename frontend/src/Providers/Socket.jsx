@@ -12,9 +12,11 @@ export const SocketProvider = (props) => {
 
   useEffect(() => {
     const socketInstance = io('http://localhost:8000');
+    
     setSocket(socketInstance);
+    console.log(socket);
 
-    // Cleanup on unmount
+    
     return () => {
       socketInstance.disconnect();
     };

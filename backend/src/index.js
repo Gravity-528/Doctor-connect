@@ -6,7 +6,6 @@ import { app } from "./app.js";
 import {Server} from "socket.io";
 
 
-
 dotenv.config({
     path: "./.env"
 });

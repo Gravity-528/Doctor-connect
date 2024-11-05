@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes ,Route} from 'react-router-dom'
+import {createBrowserRouter,RouterProvider} from "react-router-dom"
 import './App.css'
 import DoctorCard from './component/DoctorCard'
 import Hero from './component/Hero'
@@ -10,24 +10,42 @@ import FindDoctor from './Pages/FindDoctor'
 import LandingPage from './Pages/LandingPage'
 import { SocketProvider } from './Providers/Socket'
 import { PeerProvider } from './Providers/WebRTC'
+import { DataProvider } from "./Providers/DataProvider"
+import DoctorLogin from "./Pages/DoctorLogin"
+import DoctorRegister from "./Pages/DoctorRegister"
+
+
 
 function App() {
+  
+  const router=createBrowserRouter([
+    {
+       path:"/",
+       element:<LandingPage/>
+    },
+    {
+      path:'/doctorLogin',
+      element:<DoctorLogin/>
+    },
+    {
+      path:'/doctorRegister',
+      element:<DoctorRegister/>
+    }
+  ]);
 
   return (
     <>
       <SocketProvider>
       <PeerProvider>
-      <BrowserRouter>
-      <Routes>
-      <Route path="/" element={<LandingPage/>}/>
+      <DataProvider>
+      <RouterProvider router={router}/>
       {/* <LandingPage/> */}
       {/* <Navbar/> */}
       {/* <DoctorCard/> */}
       {/* <FindDoctor/> */}
       {/* <Video/> */}
       {/* <YourSlotCard/> */}
-      </Routes>
-      </BrowserRouter>
+      </DataProvider>
       </PeerProvider>
       </SocketProvider>
       
@@ -37,7 +55,3 @@ function App() {
 
 export default App
 
-// App.js
-
-
-// App.js

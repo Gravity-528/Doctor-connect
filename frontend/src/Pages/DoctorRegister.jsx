@@ -21,7 +21,7 @@ const DoctorRegister = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await RegisterDoctorGet(name,username,password,email,qualification);
+    await RegisterDoctorGet(formData.name,formData.username,formData.password,formData.email,formData.qualification);
   };
 
   return (
@@ -35,7 +35,7 @@ const DoctorRegister = () => {
           value={formData.name}
           onChange={handleChange}
           required
-          className="px-4 py-2 rounded-md"
+          className="px-4 py-2 rounded-md text-black"
         />
         <input
           type="email"
@@ -44,7 +44,7 @@ const DoctorRegister = () => {
           value={formData.email}
           onChange={handleChange}
           required
-          className="px-4 py-2 rounded-md"
+          className="px-4 py-2 rounded-md text-black"
         />
         <input
           type="text"
@@ -53,7 +53,7 @@ const DoctorRegister = () => {
           value={formData.qualification}
           onChange={handleChange}
           required
-          className="px-4 py-2 rounded-md"
+          className="px-4 py-2 rounded-md text-black"
         />
         <input
           type="text"
@@ -62,16 +62,16 @@ const DoctorRegister = () => {
           value={formData.image}
           onChange={handleChange}
           required
-          className="px-4 py-2 rounded-md"
+          className="px-4 py-2 rounded-md text-black"
         />
         <input
-          type="text"
+          type="file"
           name="username"
           placeholder="Username"
           value={formData.username}
           onChange={handleChange}
           required
-          className="px-4 py-2 rounded-md"
+          className="px-4 py-2 rounded-md text-black"
         />
         <input
           type="password"
@@ -80,7 +80,7 @@ const DoctorRegister = () => {
           value={formData.password}
           onChange={handleChange}
           required
-          className="px-4 py-2 rounded-md"
+          className="px-4 py-2 rounded-md text-black"
         />
         <button
           type="submit"
