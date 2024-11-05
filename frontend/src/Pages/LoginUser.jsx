@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useData } from '../Providers/DataProvider';
 
 const LoginUser = () => {
+  const {isAuth,setIsAuth,LoginUserGet}=useData();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -14,13 +16,11 @@ const LoginUser = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post('/api/login', formData);
-      alert(response.data.message);
-      
-    } catch (error) {
-      console.error(error);
-      alert('Error logging in');
+    await LoginUserGet(formData.username,formData.password);
+
+    if(!isAuth.valid){
+      console.log(isAuth);
+      console.error("some error in LoginUser in handleSubmit");
     }
   };
 

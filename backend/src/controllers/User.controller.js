@@ -65,32 +65,29 @@ const registerUser=asyncHandler(async(req,res)=>{
 });
 
 const LoginUser=asyncHandler(async(req,res)=>{
-    //take user detail from frontend
-    const {username,password,email}=req.body
+    
+    const {username,password}=req.body
  
-    //check if data is filled fully
-    if(!username || !password || !email){
+    
+    if(!username || !password){
      console.log(req.body);
      throw new ApiError(401,"all details are missing");
     }
  
-    //check if user exist in the database
+    
     const exist=await User.findOne({
-     $or:[{username},{email}]
+     $or:[{username}]
     })
  
     if(!exist){
      throw new ApiError(500,"there is no account with this username or email please register first");
     }
     
- 
-    //verify the password from userschema method
     const check=exist.isPasswordTrue(password);
     if(!check){
       throw new ApiError(409,"incorrect password given");
     }
  
-    //if verified return the acess and refresh token
     const {accessToken,refreshToken}=await generateAccessAndRefreshTokens(exist._id);
     console.log(exist._id);
     console.log("accessToken",accessToken);
@@ -102,11 +99,16 @@ const LoginUser=asyncHandler(async(req,res)=>{
        httpOnly:true,
        secure:true
     }
+    
+    const val={
+        valid:true,
+        role:"user"
+    }
  
     return res.status(200)
     .cookie("accessToken",accessToken,options)
     .cookie("refreshToken",refreshToken,options)
-    .json(new ApiResponse(200,loggedDetail,"logged successfully"))
+    .json({loggedDetail,val,msg:"logged successfully"})
  });
  
  const LogoutUser=asyncHandler((req,res)=>{
