@@ -13,6 +13,8 @@ import { PeerProvider } from './Providers/WebRTC'
 import { DataProvider } from "./Providers/DataProvider"
 import DoctorLogin from "./Pages/DoctorLogin"
 import DoctorRegister from "./Pages/DoctorRegister"
+import LoginUser from "./Pages/LoginUser"
+import RegisterUser from "./Pages/RegisterUser"
 
 
 
@@ -30,6 +32,16 @@ function App() {
     {
       path:'/doctorRegister',
       element:<DoctorRegister/>
+    },
+    {
+      path:'/userLogin',
+      element:<LoginUser/>
+    },{
+      path:'/userRegister',
+      element:<RegisterUser/>
+    },
+    {
+      
     }
   ]);
 
