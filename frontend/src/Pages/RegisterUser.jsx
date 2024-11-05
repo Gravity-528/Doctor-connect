@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useData } from '../Providers/DataProvider';
 
 const RegisterUser = () => {
-  
+  const {RegisterUserGet}=useData();
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -17,13 +18,7 @@ const RegisterUser = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post('/api/register', formData);
-      alert(response.data.message);
-    } catch (error) {
-      console.error(error);
-      alert('Error registering user');
-    }
+    await RegisterUserGet(formData.name,formData.username,formData.password,formData.email);
   };
 
   return (

@@ -17,7 +17,7 @@ export const ReactProvider=({children})=>{
     const [isAuth,setIsAuth]=useState({valid:false,role:null});
 
 
-    const RegisterUser=async(name,username,password,email)=>{
+    const RegisterUserGet=async(name,username,password,email)=>{
         try {
             const response=await axios.post("https://localhost:8000/api/v1/user/register",{name,username,password,email},{withCredentials:true});
             if(!response){
@@ -91,7 +91,7 @@ export const ReactProvider=({children})=>{
         fetch();
     },[]);
     return(
-    <DataContext.Provider value={{UserSlot,setUserSlot,DoctorSlot,setDoctorSlot,AllSlot,setAllSlot,Doctor,setDoctor,userById,setUserById,LoginUserGet,isAuth,setIsAuth,RegisterUser}}>
+    <DataContext.Provider value={{UserSlot,setUserSlot,DoctorSlot,setDoctorSlot,AllSlot,setAllSlot,Doctor,setDoctor,userById,setUserById,LoginUserGet,isAuth,setIsAuth,RegisterUserGet}}>
        {children}
     </DataContext.Provider>
     )
