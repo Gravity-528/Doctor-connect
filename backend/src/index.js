@@ -27,7 +27,7 @@ const map=new Map();
 io.on('connection',(socket)=>{
     console.log("server connected",socket.id);
     
-    map.set(you,socket.id);
+    // map.set(you,socket.id);
     socket.emit("welcome",`welcome to server server connected ${socket.id}`)
     socket.on('disconnect',()=>{
         console.log("user disconnected");
