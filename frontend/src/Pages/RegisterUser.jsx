@@ -32,7 +32,7 @@ const RegisterUser = () => {
           value={formData.name}
           onChange={handleChange}
           required
-          className="px-4 py-2 rounded-md"
+          className="px-4 py-2 rounded-md text-black"
         />
         <input
           type="text"
@@ -41,7 +41,7 @@ const RegisterUser = () => {
           value={formData.username}
           onChange={handleChange}
           required
-          className="px-4 py-2 rounded-md"
+          className="px-4 py-2 rounded-md text-black"
         />
         <input
           type="email"
@@ -50,7 +50,7 @@ const RegisterUser = () => {
           value={formData.email}
           onChange={handleChange}
           required
-          className="px-4 py-2 rounded-md"
+          className="px-4 py-2 rounded-md text-black"
         />
         <input
           type="password"
@@ -59,7 +59,7 @@ const RegisterUser = () => {
           value={formData.password}
           onChange={handleChange}
           required
-          className="px-4 py-2 rounded-md"
+          className="px-4 py-2 rounded-md text-black"
         />
         <button
           type="submit"

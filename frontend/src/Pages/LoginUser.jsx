@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useData } from '../Providers/DataProvider';
+import { Link } from 'react-router-dom';
 
 const LoginUser = () => {
   const {isAuth,setIsAuth,LoginUserGet}=useData();
@@ -35,7 +35,7 @@ const LoginUser = () => {
           value={formData.username}
           onChange={handleChange}
           required
-          className="px-4 py-2 rounded-md"
+          className="px-4 py-2 rounded-md text-black"
         />
         <input
           type="password"
@@ -44,7 +44,7 @@ const LoginUser = () => {
           value={formData.password}
           onChange={handleChange}
           required
-          className="px-4 py-2 rounded-md"
+          className="px-4 py-2 rounded-md text-black"
         />
         <button
           type="submit"
@@ -52,6 +52,7 @@ const LoginUser = () => {
         >
           Login
         </button>
+        <p>New to website <Link to='/userRegister' className='text-black'>Register here</Link></p>
       </form>
     </div>
   );

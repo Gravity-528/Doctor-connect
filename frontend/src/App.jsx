@@ -36,7 +36,8 @@ function App() {
     {
       path:'/userLogin',
       element:<LoginUser/>
-    },{
+    },
+    {
       path:'/userRegister',
       element:<RegisterUser/>
     },
