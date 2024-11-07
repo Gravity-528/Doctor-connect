@@ -1,6 +1,6 @@
-import React from "react";
-
-const SlotCard = (props) => {
+import React,{useState,useEffect} from "react";
+import axios from "axios";
+const SlotCard = ({props}) => {
   
   const [isAvailable,setIsAvailable]=useState(true);
   // const currTime=Date.now();
@@ -17,11 +17,23 @@ const SlotCard = (props) => {
   }
 
   useEffect(()=>{
-    const currTime=Date.now();
-    const slotTime = new Date();
-    const [hours, minutes] = props.Time.split(":").map(Number);
-    slotTime.setHours(hours-1, minutes, 0, 0);
-     setIsAvailable(props.status==="available" && currTime<slotTime);
+    // const currTime=Date.now();
+    // const slotTime = new Date();
+    // const [hours, minutes] = props.Time.split(":").map(Number);
+    // slotTime.setHours(hours-1, minutes, 0, 0);
+    //  setIsAvailable(props.status==="available" && currTime<slotTime);
+    if (props.Time) {
+      const currTime = Date.now();
+      const slotTime = new Date(props.Time); // Using the Date object directly
+      const hours = slotTime.getHours();
+      const minutes = slotTime.getMinutes();
+  
+      slotTime.setHours(hours - 1, minutes, 0, 0); // Adjust time if needed
+      setIsAvailable(props.status === "available" && currTime < slotTime);
+    } else {
+      // Handle case where Time is not available
+      setIsAvailable(false);
+    }
   },[props.status,props.Time]);
   return (
     <div className="max-w-xs rounded-lg overflow-hidden shadow-md bg-white border border-gray-200 p-4">

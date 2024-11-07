@@ -45,7 +45,7 @@ const registerDoctor=asyncHandler(async(req,res)=>{
     })
     // console.log(exist);
     if(exist){
-        throw new ApiError(400,"this account already exists");
+        throw new ApiError(500,"this account already exists");
     }
 
     const DoctorLocalPath = req.files?.DoctorPhoto[0]?.path;
@@ -226,7 +226,8 @@ const SlotAttend=asyncHandler(async(req,res)=>{
 const FindDoctorById=asyncHandler(async(req,res)=>{
     const {username}=req.body;
     try{
-    const FindDoctor=await Doctor.findById({username:username}).populate('DoctorSlot');
+    const FindDoctor=await Doctor.find({username:username}).populate('DoctorSlot');
+    console.log("FindDoctor",FindDoctor);
     return res.status(200).json({msg:"findDoctor by id FEtched successfully",data:FindDoctor});
     }catch(err){
         console.error(err);

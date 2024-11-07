@@ -1,15 +1,17 @@
-import React, { useEffect } from 'react'
+import React, { useEffect,useState } from 'react'
 import { useParams } from 'react-router-dom'
 import SlotCard from "../component/SlotCard.jsx"
+import axios from "axios"
 
 const SlotPage = () => {
   const {username}=useParams();
 
-  const [doctor,setDoctor]=useState({});
+  const [doctor,setDoctor]=useState([]);
   
   const fetchData=async()=>{
-     const response=await axios.post('https://localhost:8000/api/v1/doctor/FindDoctorById',{username},{withCredentials:true});
-     setDoctor(response.data);
+     const response=await axios.post('http://localhost:8000/api/v1/doctor/FindDoctorById',{username},{withCredentials:true});
+     setDoctor(response.data.data);
+     console.log("all slot is",doctor);
   }
   useEffect(()=>{
      fetchData();

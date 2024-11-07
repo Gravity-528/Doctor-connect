@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useData } from '../Providers/DataProvider';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterUser = () => {
+  const navigate=useNavigate();
   const {RegisterUserGet}=useData();
   const [formData, setFormData] = useState({
     name: '',
@@ -19,6 +21,7 @@ const RegisterUser = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await RegisterUserGet(formData.name,formData.username,formData.password,formData.email);
+    navigate('/userLogin');
   };
 
   return (

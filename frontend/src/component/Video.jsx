@@ -2,12 +2,20 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSocket } from '../Providers/Socket';
 import { usePeer } from '../Providers/WebRTC';
 import { useParams } from 'react-router-dom';
-import { useData } from '../Providers/DataProvider';
 
 const Video = () => {
    const {username}=useParams();
 
-   const {userById}=useData();
+   // const {userById}=useData();
+   const [userById,setUserById]=useState(null);
+   const GetUserId=async()=>{
+      try {
+          const response=await axios.get('https://localhost:8000/api/v1/user/fetchById',{withCredentials:true});
+          setUserById(response.data);
+      } catch (error) {
+          console.error("some frontend error in fetching userById",error);
+      }
+  }
    const socket = useSocket();
    const { peer, SendOffer, RecieveAnswer, getCam } = usePeer();
 
@@ -52,6 +60,7 @@ const Video = () => {
    };
 
    useEffect(() => {
+      GetUserId();
       peer.onnegotiationneeded = SendMessage;
       socket.on('create-offer', GetMessage);
       socket.on('create-answer', GetAnswer);

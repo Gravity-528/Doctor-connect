@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect,useState } from 'react'
 import { useData } from '../Providers/DataProvider'
 import YourSlotCard from '../component/YourSlotCard';
 import Navbar from '../component/Navbar';
@@ -6,11 +6,11 @@ import Footer from '../component/Footer';
 
 const YourSlot = () => {
     
-    const [UserSlot,setUserSlot]=useState({});
+    const [UserSlot,setUserSlot]=useState([]);
     const GetUserSlot=async()=>{
       try{
           const YourSlot=await axios.get('https://localhost:8000/api/v1/user/getSlot',{withCredentials:true});
-          setUserSlot(YourSlot.data);
+          setUserSlot(YourSlot.data.data);
           }catch(err){
               console.error("error is here :",err);
           }

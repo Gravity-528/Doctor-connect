@@ -16,6 +16,7 @@ import DoctorRegister from "./Pages/DoctorRegister"
 import LoginUser from "./Pages/LoginUser"
 import RegisterUser from "./Pages/RegisterUser"
 import SlotPage from "./Pages/SlotPage"
+import YourSlot from "./Pages/YourSlot"
 
 
 
@@ -49,14 +50,18 @@ function App() {
     {
       path:'/SeeDoctor',
       element:<FindDoctor/>,
-      children:[
-        {
-          path:':username',
-          element:<SlotPage/>
-        }
-      ]
+      // children:[
+      //   {
+      //     path:':username',
+      //     element:<SlotPage/>
+      //   }
+      // ]
     },
-    ,{
+    {
+      path:'/SeeDoctor/:username',
+      element:<SlotPage/>
+    },
+    {
       path:'/YourSlot',
       element:<YourSlot/>,
       children:[

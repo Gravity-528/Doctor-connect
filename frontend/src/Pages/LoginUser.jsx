@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useData } from '../Providers/DataProvider';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const LoginUser = () => {
+  const navigate=useNavigate();
   const {isAuth,setIsAuth,LoginUserGet}=useData();
   const [formData, setFormData] = useState({
     username: '',
@@ -17,11 +18,15 @@ const LoginUser = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await LoginUserGet(formData.username,formData.password);
+    
+    // setIsAuth(isAuth);
+    console.log(isAuth);
+    // if(!isAuth.valid){
+    //   console.log(isAuth);
+    //   console.error("some error in LoginUser in handleSubmit");
+    // }
+    navigate('/userHome');
 
-    if(!isAuth.valid){
-      console.log(isAuth);
-      console.error("some error in LoginUser in handleSubmit");
-    }
   };
 
   return (

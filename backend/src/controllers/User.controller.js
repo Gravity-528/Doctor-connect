@@ -2,6 +2,7 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 import {ApiError} from "../utils/ApiError.js"
 import {User}  from "../models/User.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
+import bcrypt from "bcrypt";
 
 const generateAccessAndRefreshTokens= async(userid)=>{
     try {
@@ -23,6 +24,7 @@ const generateAccessAndRefreshTokens= async(userid)=>{
        
         
     } catch (error) {
+        console.error(error);
         throw new ApiError(409,"some error while generating access Token and refresh Token")
     }
 }
@@ -47,6 +49,7 @@ const registerUser=asyncHandler(async(req,res)=>{
 
     
     const user=await User.create({
+        name,
         username,
         password,
         email
@@ -108,7 +111,7 @@ const LoginUser=asyncHandler(async(req,res)=>{
     return res.status(200)
     .cookie("accessToken",accessToken,options)
     .cookie("refreshToken",refreshToken,options)
-    .json({loggedDetail,val,msg:"logged successfully"})
+    .json({data:loggedDetail,val:val,msg:"logged successfully"})
  });
  
  const LogoutUser=asyncHandler((req,res)=>{

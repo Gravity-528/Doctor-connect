@@ -1,6 +1,6 @@
 import React from "react";
-
-const DoctorCard = (props) => {
+import { Link } from "react-router-dom";
+const DoctorCard = ({props}) => {
   return (
     <div className="max-w-sm rounded-lg overflow-hidden shadow-lg bg-white">
       <img
@@ -14,11 +14,11 @@ const DoctorCard = (props) => {
         <p className="text-gray-700 mb-4">{props.email}</p>
         <div className="flex justify-between items-center">
           <span className="text-lg font-semibold text-gray-900">₹200</span>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">
           <Link to={`/SeeDoctor/${props.username}`}>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">
             Book Now
-          </Link>
           </button>
+          </Link>
         </div>
       </div>
     </div>
