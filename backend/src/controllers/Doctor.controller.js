@@ -226,9 +226,9 @@ const SlotAttend=asyncHandler(async(req,res)=>{
 const FindDoctorById=asyncHandler(async(req,res)=>{
     const {username}=req.body;
     try{
-    const FindDoctor=await Doctor.find({username:username}).populate('DoctorSlot');
-    console.log("FindDoctor",FindDoctor);
-    return res.status(200).json({msg:"findDoctor by id FEtched successfully",data:FindDoctor});
+    const FindDoctor=await Doctor.findOne({username:username}).populate('DoctorSlot');
+    console.log("FindDoctor is",FindDoctor.DoctorSlot);
+    return res.status(200).json({msg:"findDoctor by id FEtched successfully",data:FindDoctor.DoctorSlot});
     }catch(err){
         console.error(err);
         return res.status(500).json({msg:"error in fetching DoctorById",err});

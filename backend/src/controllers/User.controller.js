@@ -182,7 +182,8 @@ const FetchBookedSlot=asyncHandler(async(req,res)=>{
     const userId=req.user._id;
     try{
       const findSlot=await User.find({_id:userId}).populate('YourSlot');
-      return res.status(200).json({msg:"fetched successfully",data:findSlot});
+      console.log(findSlot);
+      return res.status(200).json({msg:"fetched successfully",data:findSlot.YourSlot});
     }catch(err){
         console.error("some error is here",err);
         return res.status(500).json({ msg: "Failed to fetch slots", error: error.message });

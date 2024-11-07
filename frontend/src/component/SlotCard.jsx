@@ -7,7 +7,7 @@ const SlotCard = ({props}) => {
 
   const BookSlot=async()=>{
      try{
-     const response=await axios.post("https://localhost:8000/api/v1/Slot/bookSlot",{DoctorId:props.Doctor,time:props.Time},{withCredentials:true});
+     const response=await axios.post("http://localhost:8000/api/v1/Slot/bookSlot",{DoctorId:props.Doctor,time:props.Time},{withCredentials:true});
      if(response){
       alert("booking done successfully");
      }
@@ -24,17 +24,18 @@ const SlotCard = ({props}) => {
     //  setIsAvailable(props.status==="available" && currTime<slotTime);
     if (props.Time) {
       const currTime = Date.now();
-      const slotTime = new Date(props.Time); // Using the Date object directly
+      const slotTime = new Date(props.Time); 
       const hours = slotTime.getHours();
       const minutes = slotTime.getMinutes();
   
-      slotTime.setHours(hours - 1, minutes, 0, 0); // Adjust time if needed
-      setIsAvailable(props.status === "available" && currTime < slotTime);
+      slotTime.setHours(hours - 1, minutes, 0, 0); 
+      setIsAvailable(props.check === "available");
     } else {
       // Handle case where Time is not available
       setIsAvailable(false);
     }
   },[props.status,props.Time]);
+  console.log("isAvailable",isAvailable);
   return (
     <div className="max-w-xs rounded-lg overflow-hidden shadow-md bg-white border border-gray-200 p-4">
       <div className="flex justify-between items-center">

@@ -1,6 +1,6 @@
 import React from 'react';
-
-const YourSlotCard = (props) => {
+import { Link } from 'react-router-dom';
+const YourSlotCard = ({props}) => {
 
   
   return (

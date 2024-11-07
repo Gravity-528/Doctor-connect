@@ -11,8 +11,9 @@ const SlotPage = () => {
   const fetchData=async()=>{
      const response=await axios.post('http://localhost:8000/api/v1/doctor/FindDoctorById',{username},{withCredentials:true});
      setDoctor(response.data.data);
-     console.log("all slot is",doctor);
+     
   }
+  console.log("all slot is",doctor);
   useEffect(()=>{
      fetchData();
   },[])
