@@ -39,16 +39,16 @@ export const DataProvider=({children})=>{
     }
     const LoginDoctorGet=async(username,password)=>{
         try{
-           const response=await axios.post("https://localhost:8000/api/v1/doctor/loginDoctor",{username,password},{withCredentials:true});
+           const response=await axios.post("http://localhost:8000/api/v1/doctor/loginDoctor",{username,password},{withCredentials:true});
            const value=response.val;
            setIsAuth({valid:value.valid,role:value.role});
         }catch(error){
             console.error("error in login in frontend part",error);
         }
     }
-    const RegisterDoctorGet=async(name,username,password,email,qualification)=>{
+    const RegisterDoctorGet=async(data)=>{
         try {
-            const response=await axios.post("https://localhost:8000/api/v1/doctor/registerDoctor",{name,username,password,email,qualification},{withCredentials:true});
+            const response=await axios.post("http://localhost:8000/api/v1/doctor/registerDoctor",data,{withCredentials:true});
             if(!response){
                 console.error("error in registering user try again");
             }
@@ -75,20 +75,20 @@ export const DataProvider=({children})=>{
     }
     const GetAllDoctor=async()=>{
         try {
-            const response=await axios.get('https://localhost:8000/api/v1/doctor/doctorSlot',{withCredentials:true});
+            const response=await axios.get('https://localhost:8000/api/v1/doctor/allDoctor',{withCredentials:true});
             setDoctor(response.data);
         } catch (error) {
             console.error("error in fetching the doctor",error);
         }
     }
-    const GetUserSlot=async()=>{
-        try{
-            const YourSlot=await axios.get('https://localhost:8000/api/v1/user/getSlot',{withCredentials:true});
-            setUserSlot(YourSlot.data);
-            }catch(err){
-                console.error("error is here :",err);
-            }
-    }
+    // const GetUserSlot=async()=>{
+    //     try{
+    //         const YourSlot=await axios.get('https://localhost:8000/api/v1/user/getSlot',{withCredentials:true});
+    //         setUserSlot(YourSlot.data);
+    //         }catch(err){
+    //             console.error("error is here :",err);
+    //         }
+    // }
 
     const GetAllSlot=async()=>{
         try {
@@ -101,7 +101,7 @@ export const DataProvider=({children})=>{
 
     useEffect(()=>{
         const fetch=async()=>{
-          await GetUserSlot();
+        //   await GetUserSlot();
           await GetDoctorSlot();
           await GetAllSlot();
           await GetAllDoctor();
@@ -110,7 +110,7 @@ export const DataProvider=({children})=>{
         fetch();
     },[]);
     return(
-    <DataContext.Provider value={{UserSlot,setUserSlot,DoctorSlot,setDoctorSlot,AllSlot,setAllSlot,Doctor,setDoctor,userById,setUserById,LoginUserGet,isAuth,setIsAuth,RegisterUserGet,LoginDoctorGet,RegisterDoctorGet}}>
+    <DataContext.Provider value={{DoctorSlot,setDoctorSlot,AllSlot,setAllSlot,Doctor,setDoctor,userById,setUserById,LoginUserGet,isAuth,setIsAuth,RegisterUserGet,LoginDoctorGet,RegisterDoctorGet}}>
        {children}
     </DataContext.Provider>
     )

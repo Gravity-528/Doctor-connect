@@ -20,7 +20,7 @@ const SlotCard = (props) => {
     const currTime=Date.now();
     const slotTime = new Date();
     const [hours, minutes] = props.Time.split(":").map(Number);
-    slotTime.setHours(hours, minutes, 0, 0);
+    slotTime.setHours(hours-1, minutes, 0, 0);
      setIsAvailable(props.status==="available" && currTime<slotTime);
   },[props.status,props.Time]);
   return (

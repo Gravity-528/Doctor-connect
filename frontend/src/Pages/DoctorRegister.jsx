@@ -7,7 +7,7 @@ const DoctorRegister = () => {
     name: '',
     email: '',
     qualification: '',
-    image: '',
+    DoctorPhoto: '',
     username: '',
     password: '',
   });
@@ -15,13 +15,25 @@ const DoctorRegister = () => {
   const {RegisterDoctorGet}=useData();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const { name, value,type,files } = e.target;
+    if(type=='file'){
+      setFormData({ ...formData, [name]: files[0] });
+    
+    }else{
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await RegisterDoctorGet(formData.name,formData.username,formData.password,formData.email,formData.qualification);
+    const data = new FormData();
+    data.append('name', formData.name);
+    data.append('email', formData.email);
+    data.append('qualification', formData.qualification);
+    data.append('DoctorPhoto', formData.DoctorPhoto); 
+    data.append('username', formData.username);
+    data.append('password', formData.password);
+    await RegisterDoctorGet(data);
   };
 
   return (
@@ -56,16 +68,14 @@ const DoctorRegister = () => {
           className="px-4 py-2 rounded-md text-black"
         />
         <input
-          type="text"
-          name="image"
-          placeholder="Image URL"
-          value={formData.image}
+          type="file"
+          name="DoctorPhoto"  
           onChange={handleChange}
           required
           className="px-4 py-2 rounded-md text-black"
         />
         <input
-          type="file"
+          type="text"
           name="username"
           placeholder="Username"
           value={formData.username}

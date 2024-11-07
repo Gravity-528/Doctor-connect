@@ -2,6 +2,7 @@ import React from 'react'
 import Navbar from '../component/Navbar'
 import DoctorCard from '../component/DoctorCard'
 import { useData } from '../Providers/DataProvider'
+import Footer from '../component/Footer'
 
 
 
@@ -17,6 +18,7 @@ const FindDoctor = () => {
            )
         
         })}
+        <Footer/>
     </>
   )
 }

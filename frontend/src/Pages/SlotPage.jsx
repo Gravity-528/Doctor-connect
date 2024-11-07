@@ -1,11 +1,14 @@
 import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import SlotCard from "../component/SlotCard.jsx"
+
 const SlotPage = () => {
-  const id=useParams();
+  const {username}=useParams();
+
   const [doctor,setDoctor]=useState({});
-  const fetchData=async(id)=>{
-     const response=await axios.post('https://localhost:8000/api/v1/doctor/',{id},{withCredentials:true});
+  
+  const fetchData=async()=>{
+     const response=await axios.post('https://localhost:8000/api/v1/doctor/FindDoctorById',{username},{withCredentials:true});
      setDoctor(response.data);
   }
   useEffect(()=>{
@@ -22,4 +25,4 @@ const SlotPage = () => {
   )
 }
 
-export default SlotPage
+export default SlotPage;

@@ -15,7 +15,9 @@ const DoctorCard = (props) => {
         <div className="flex justify-between items-center">
           <span className="text-lg font-semibold text-gray-900">₹200</span>
           <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">
+          <Link to={`/SeeDoctor/${props.username}`}>
             Book Now
+          </Link>
           </button>
         </div>
       </div>

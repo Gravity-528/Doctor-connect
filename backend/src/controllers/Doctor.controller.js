@@ -3,6 +3,8 @@ import {ApiError} from "../utils/ApiError.js"
 import { Doctor}  from "../models/Doctor.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 import {Slot} from "../models/Slot.js";
+import {uploadOnCloudinary} from "../utils/Cloudinary.js"
+import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshTokens= async(doctorid)=>{
     try {
@@ -32,7 +34,7 @@ const registerDoctor=asyncHandler(async(req,res)=>{
     
     const {name,username,password,email,qualification}=req.body;
 
-    
+    try{
     if(!name || !username || !password || !email || !qualification){
         throw new ApiError(400,"all fields required");
     }
@@ -41,16 +43,28 @@ const registerDoctor=asyncHandler(async(req,res)=>{
     const exist=await Doctor.findOne({
         $or:[{email},{username}]
     })
-    console.log(exist);
+    // console.log(exist);
     if(exist){
         throw new ApiError(400,"this account already exists");
     }
 
-    
+    const DoctorLocalPath = req.files?.DoctorPhoto[0]?.path;
+    console.log("image is",DoctorLocalPath);
+  if (!DoctorLocalPath) {
+    throw new ApiError(400, "image is required:");
+  }
+
+  const DoctorPhoto = await uploadOnCloudinary(DoctorLocalPath);
+  console.log(DoctorPhoto);
+  if (!DoctorPhoto) {
+    throw new ApiError(500, "image cant be uploaded");
+  }
     const doctor=await Doctor.create({
+        name,
         username,
         password,
         email,
+        image:DoctorPhoto.url,
         qualification
     });
 
@@ -60,22 +74,32 @@ const registerDoctor=asyncHandler(async(req,res)=>{
         throw new ApiError(500,"user has not been registered");
     }
 
-    
+    const time1=new Date();
+    const time2=new Date();
+    time1.setHours(15,0,0);
+    time2.setHours(18,0,0);
+
     const Slot1=await Slot.create({
         Doctor:doctor.id,
-        Time:"3:00 pm",
+        Time:time1,
         price:250,
         check:"available"
     });
+    const updateDoctor1=await Doctor.findOneAndUpdate({_id:doctor._id},{$push:{DoctorSlot:Slot1._id}},{new:true});
     const Slot2=await Slot.create({
         Doctor:doctor.id,
-        Time:"9:00 pm",
+        Time:time2,
         price:250,
         check:"available"
     });
+    const updateDoctor2=await Doctor.findOneAndUpdate({_id:doctor._id},{$push:{DoctorSlot:Slot2._id}},{new:true});
     return res.status(201).json(
-       new ApiResponse(201,check,"user registered successfully")
+       {data:updateDoctor2,msg:"user registered successfully"}
     )
+}catch(err){
+    console.error("some error in registering backend",err);
+    res.status(500).json({msg:"some error in registering backend"});
+}
 });
 
 const LoginDoctor=asyncHandler(async(req,res)=>{
@@ -200,9 +224,9 @@ const SlotAttend=asyncHandler(async(req,res)=>{
 })
 
 const FindDoctorById=asyncHandler(async(req,res)=>{
-    const {id}=req.body;
+    const {username}=req.body;
     try{
-    const FindDoctor=await Doctor.findById(id).populate('DoctorSlot');
+    const FindDoctor=await Doctor.findById({username:username}).populate('DoctorSlot');
     return res.status(200).json({msg:"findDoctor by id FEtched successfully",data:FindDoctor});
     }catch(err){
         console.error(err);
@@ -210,5 +234,16 @@ const FindDoctorById=asyncHandler(async(req,res)=>{
     }
 })
 
+const AllDoctor=asyncHandler(async(req,res)=>{
+    try{
+       
+       const find=await Doctor.find();
+       res.status(200).json({msg:"All Doctor Fetched Successfully",data:find});
 
-export {registerDoctor,LoginDoctor,LogoutDoctor,refreshAccesToken,editDoctor,SlotAttend,FindDoctorById}
+    }catch(err){
+       console.error("error in AllDoctor backend",err);
+       res.status(500).json("error in AllDoctor backend");
+    }
+})
+
+export {registerDoctor,LoginDoctor,LogoutDoctor,refreshAccesToken,editDoctor,SlotAttend,FindDoctorById,AllDoctor}
