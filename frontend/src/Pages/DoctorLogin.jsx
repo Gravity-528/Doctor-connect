@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { useData } from '../Providers/DataProvider';
 
 const DoctorLogin = () => {
+  const {LoginDoctorGet}=useData();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -15,7 +17,7 @@ const DoctorLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    await LoginDoctorGet(formData.username,formData.password);
   };
 
   return (
