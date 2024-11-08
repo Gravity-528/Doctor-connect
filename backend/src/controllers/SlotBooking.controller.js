@@ -22,7 +22,8 @@ const fetchSlot=asyncHandler(async(req,res)=>{
 const bookSlot=asyncHandler(async(req,res)=>{
      
      const { DoctorId, time } = req.body;   
-     const {userId}=req.user;
+     const userId=req.user._id;
+     console.log("userId" ,userId);
      const locked=await Slot.findOneAndUpdate({Doctor:DoctorId,Time:time,check:"available"},{$set:{check:"unavailable"}},{new:true})
      if(!locked){
       //  await session.abortTransaction();
@@ -39,8 +40,9 @@ const bookSlot=asyncHandler(async(req,res)=>{
     };
     const order = await razorpay.orders.create(options);
     const findSlot=await Slot.findOneAndUpdate({Doctor:DoctorId,Time:time},{$set:{Patient:userId}},{new:true});
-    const updateUser=await User.findOneAndUpdate({_id:userId},{$push:{YourSlot:findSlot._id}},{new:true});
-    const updateDoctor=await Doctor.findOneAndUpdate({_id:DoctorId},{$push:{ToAttendSlot:findSlot._id}},{new:true});
+    const updateUser=await User.findOneAndUpdate({_id:userId},{$addToSet:{YourSlot:locked._id}},{new:true});
+    console.log("new user is",locked._id);
+    const updateDoctor=await Doctor.findOneAndUpdate({_id:DoctorId},{$addToSet:{ToAttendSlot:locked._id}},{new:true});
     
     if(!findSlot){
       await session.abortTransaction();

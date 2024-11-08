@@ -2,22 +2,32 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSocket } from '../Providers/Socket';
 import { usePeer } from '../Providers/WebRTC';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import { useData } from '../Providers/DataProvider';
 
 const Video = () => {
+   const {isAuth}=useData();
    const {username}=useParams();
-
+   console.log("username route is",username);
    // const {userById}=useData();
-   const [userById,setUserById]=useState(null);
+   const [userById,setUserById]=useState([]);
+   console.log("isAuth is",isAuth);
+   const socket = useSocket();
+   console.log("your socket is",socket);
    const GetUserId=async()=>{
       try {
-          const response=await axios.get('https://localhost:8000/api/v1/user/fetchById',{withCredentials:true});
-          setUserById(response.data);
+          const response=await axios.get('http://localhost:8000/api/v1/user/fetchById',{withCredentials:true});
+          console.log(response);
+          setUserById(response.data.data.username);
+          socket.on("register",{you:response.data.data.username});
       } catch (error) {
           console.error("some frontend error in fetching userById",error);
       }
   }
-   const socket = useSocket();
+   
    const { peer, SendOffer, RecieveAnswer, getCam } = usePeer();
+   
+   
 
    const localVideoRef = useRef();
    const remoteVideoRef = useRef();
@@ -60,11 +70,12 @@ const Video = () => {
    };
 
    useEffect(() => {
+
       GetUserId();
       peer.onnegotiationneeded = SendMessage;
       socket.on('create-offer', GetMessage);
       socket.on('create-answer', GetAnswer);
-
+      
       SendLocalStream();
 
       peer.ontrack = ReceiveVideo;

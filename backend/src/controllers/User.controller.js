@@ -181,9 +181,9 @@ const editUser=asyncHandler(async(req,res)=>{
 const FetchBookedSlot=asyncHandler(async(req,res)=>{
     const userId=req.user._id;
     try{
-      const findSlot=await User.find({_id:userId}).populate('YourSlot');
-      console.log(findSlot);
-      return res.status(200).json({msg:"fetched successfully",data:findSlot.YourSlot});
+      const findSlot=await User.findById(userId).populate('YourSlot');
+    //   console.log("YourSlot backend",findSlot);
+      return res.status(200).json({data:findSlot.YourSlot,msg:"fetched successfully"});
     }catch(err){
         console.error("some error is here",err);
         return res.status(500).json({ msg: "Failed to fetch slots", error: error.message });
@@ -199,11 +199,13 @@ const FetchDoctorByUserName=asyncHandler(async(req,res)=>{
 
 const GetUserById=asyncHandler(async(req,res)=>{
    const user=req.user;
+   console.log("user token is",user);
    try{
+    
    if(!user){
     return res.status(401).json({msg:"error is here in fetching the user by id"});
    }
-   return res.status(200).json({msg:"fetched the user by id successfully",user});
+   return res.status(200).json({data:user,msg:"fetched the user by id successfully"});
   }catch(err){
     console.error("error is here in fetching the user by id",err);
     return res.status(500).json({msg:"error is here in fetching the user by id"});

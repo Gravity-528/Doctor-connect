@@ -46,7 +46,7 @@ const DoctorLogin = () => {
         >
           Login
         </button>
-        <p>New to website <Link to='/doctorRegister'>Login</Link></p>
+        <p>New to website <Link to='/doctorRegister' className='text-black'>Register</Link></p>
       </form>
     </div>
   );

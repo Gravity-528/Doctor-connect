@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useData } from '../Providers/DataProvider';
+import { useNavigate } from 'react-router-dom';
 
 const DoctorRegister = () => {
+  const navigate=useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -33,7 +35,11 @@ const DoctorRegister = () => {
     data.append('DoctorPhoto', formData.DoctorPhoto); 
     data.append('username', formData.username);
     data.append('password', formData.password);
-    await RegisterDoctorGet(data);
+    RegisterDoctorGet(data).then(()=>{
+      navigate('/doctorLogin');
+    }).catch((err)=>{
+      console.log("some errpr in registering user",err);
+    });
   };
 
   return (

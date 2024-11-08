@@ -64,12 +64,9 @@ function App() {
     {
       path:'/YourSlot',
       element:<YourSlot/>,
-      children:[
-        {
-          path:':username',
-          element:<Video/>
-        }
-      ]
+    },{
+      path:'/YourSlot/:username',
+      element:<Video/>
     }
   ]);
 

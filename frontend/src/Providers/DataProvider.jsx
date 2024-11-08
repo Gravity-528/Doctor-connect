@@ -44,7 +44,7 @@ export const DataProvider=({children})=>{
            const response=await axios.post("http://localhost:8000/api/v1/doctor/loginDoctor",{username,password},{withCredentials:true});
            const value=response.val;
         //    setIsAuth({valid:value.valid,role:value.role});
-        setIsAuth((prevState) => ({ valid: value.valid, role: value.role }));
+        setIsAuth({valid: value.valid, role: value.role });
         }catch(error){
             console.error("error in login in frontend part",error);
         }

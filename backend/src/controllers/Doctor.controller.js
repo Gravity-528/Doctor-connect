@@ -79,16 +79,34 @@ const registerDoctor=asyncHandler(async(req,res)=>{
     time1.setHours(15,0,0);
     time2.setHours(18,0,0);
 
+    const date1 = new Date(time1); 
+
+
+const time12 = date1.toLocaleTimeString('en-US', {
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit'
+});
+
+const date2 = new Date(time2); 
+
+
+const time21 = date2.toLocaleTimeString('en-US', {
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit'
+});
+
     const Slot1=await Slot.create({
         Doctor:doctor.id,
-        Time:time1,
+        Time:time12,
         price:250,
         check:"available"
     });
     const updateDoctor1=await Doctor.findOneAndUpdate({_id:doctor._id},{$push:{DoctorSlot:Slot1._id}},{new:true});
     const Slot2=await Slot.create({
         Doctor:doctor.id,
-        Time:time2,
+        Time:time21,
         price:250,
         check:"available"
     });
@@ -246,5 +264,21 @@ const AllDoctor=asyncHandler(async(req,res)=>{
        res.status(500).json("error in AllDoctor backend");
     }
 })
+const GetDoctorId=asyncHandler(async(req,res)=>{
+    const {id}=req.body;
+    try {
+        
+       const response=await Doctor.findById(id);
+       if(!response){
+        return res.status(400).json({msg:"user not found"});
+       }
 
-export {registerDoctor,LoginDoctor,LogoutDoctor,refreshAccesToken,editDoctor,SlotAttend,FindDoctorById,AllDoctor}
+       res.status(201).json({data:response,msg:"data fetched successfully"});
+
+    } catch (error) {
+        console.error("error in backend GetDoctorId",error);
+        return res.status(400).json({msg:"user not found"});
+    }
+})
+
+export {registerDoctor,LoginDoctor,LogoutDoctor,refreshAccesToken,editDoctor,SlotAttend,FindDoctorById,AllDoctor,GetDoctorId}

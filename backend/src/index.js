@@ -26,9 +26,16 @@ const map=new Map();
 io.on('connection',(socket)=>{
     console.log("server connected",socket.id);
     
-    // map.set(you,socket.id);
+    socket.on('register',(you)=>{
+        socket.userId=you;
+        map.set(you,socket.id);
+        console.log("user hashed successfully");
+    })
     socket.emit("welcome",`welcome to server server connected ${socket.id}`)
     socket.on('disconnect',()=>{
+        if(socket.userId){
+            map.delete(socket.userId);
+        }
         console.log("user disconnected");
     })
     socket.on('message',({type,sdp,you,other})=>{

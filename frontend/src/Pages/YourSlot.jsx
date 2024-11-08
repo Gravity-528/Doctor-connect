@@ -11,17 +11,17 @@ const YourSlot = () => {
     const GetUserSlot=async()=>{
       try{
           const YourSlot=await axios.get('http://localhost:8000/api/v1/user/getSlot',{withCredentials:true});
-          console.log("YourSlot is",YourSlot)
+          // console.log("YourSlot is",YourSlot)
           setUserSlot(YourSlot.data.data);
           }catch(err){
               console.error("error is here :",err);
           }
 
   }
-  console.log("userSlot is",UserSlot);
+  // console.log("userSlot is",UserSlot);
   useEffect(()=>{
     GetUserSlot();
-  })
+  },[])
   //  console.log(UserSlot); 
   return (
     <div>
