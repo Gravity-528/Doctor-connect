@@ -16,6 +16,7 @@ const DoctorVideo = () => {
       try{
          const response=await axios.get("http://localhost:8000/api/v1/doctor/doctorBhai",{withCredentials:true});
          setDoctorBhai(response.data.data);
+         socket.emit("register",{you:response.data.data.username})
       }catch(error){
          console.log("error in getting doctorid at doctorvideo",err);
       }
@@ -76,7 +77,7 @@ const DoctorVideo = () => {
          socket.off('create-offer', GetMessage);
          socket.off('create-answer', GetAnswer);
       };
-   }, []);
+   }, [doctorBhai,peer,socket]);
 
    return (
       <div className="bg-gray-800 h-screen flex flex-col justify-center items-center text-white">

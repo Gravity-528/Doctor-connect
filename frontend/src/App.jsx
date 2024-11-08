@@ -74,7 +74,8 @@ function App() {
     },{
       path:'/YourSlot/:username',
       element:<Video/>
-    },{
+    },
+    {
       path:'/DoctorSlot',
       element:<DoctorSlotAttend/>
     },{

@@ -233,9 +233,10 @@ const editDoctor=asyncHandler(async(req,res)=>{
 
 const SlotAttend=asyncHandler(async(req,res)=>{
      const doctor=req.doctor._id;
+     console.log("doctor id",doctor);
      try{
-     const FindSlot=await Slot.findById(doctor).populate('ToAttendSlot');
-
+     const FindSlot=await Doctor.findById(doctor).populate('ToAttendSlot');
+     console.log("FindSlot",FindSlot);
      return res.status(200).json({msg:"Slot fetched Successfully",data:FindSlot.ToAttendSlot});
      }catch(err){
         console.error("some error is here",err);
@@ -287,6 +288,7 @@ const GetUser=asyncHandler(async(req,res)=>{
 
     try{
         const user=await User.findById(id);
+        console.log("user is---------------------------------",user);
         if(!user){
          return res.status(401).json({msg:"error is here in fetching the user by id"});
         }

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useData } from '../Providers/DataProvider';
 
 const DoctorLogin = () => {
+  const navigate=useNavigate();
   const {LoginDoctorGet}=useData();
   const [formData, setFormData] = useState({
     username: '',
@@ -17,7 +18,11 @@ const DoctorLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await LoginDoctorGet(formData.username,formData.password);
+    LoginDoctorGet(formData.username,formData.password).then(()=>{
+      navigate('/DoctorHome')
+    }).catch((err)=>{
+      console.error("error in login frontend",err);
+    });
   };
 
   return (
@@ -42,7 +47,7 @@ const DoctorLogin = () => {
           required
           className="px-4 py-2 rounded-md text-black"
         />
-        <Link to={'/DoctorHome'}>
+        {/* <Link to={'/DoctorHome'}> */}
         <button
           type="submit"
           className="bg-white text-blue-500 px-6 py-3 rounded-md font-semibold hover:bg-gray-200 transition duration-300 ease-in-out"
@@ -50,7 +55,7 @@ const DoctorLogin = () => {
 
           Login
         </button>
-        </Link>
+        {/* </Link> */}
         <p>New to website <Link to='/doctorRegister' className='text-black'>Register</Link></p>
       </form>
     </div>

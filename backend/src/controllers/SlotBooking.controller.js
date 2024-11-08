@@ -43,6 +43,7 @@ const bookSlot=asyncHandler(async(req,res)=>{
     const updateUser=await User.findOneAndUpdate({_id:userId},{$addToSet:{YourSlot:locked._id}},{new:true});
     console.log("new user is",locked._id);
     const updateDoctor=await Doctor.findOneAndUpdate({_id:DoctorId},{$addToSet:{ToAttendSlot:locked._id}},{new:true});
+    console.log(updateDoctor);
     
     if(!findSlot){
       await session.abortTransaction();
