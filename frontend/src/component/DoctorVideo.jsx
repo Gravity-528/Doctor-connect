@@ -7,7 +7,7 @@ import axios from 'axios';
 
 const DoctorVideo = () => {
    const {username}=useParams();
-
+   const { peer, SendOffer, RecieveAnswer, getCam } = usePeer();
    // const {userById}=useData();
    const [doctorBhai,setDoctorBhai]=useState();
    
@@ -21,8 +21,8 @@ const DoctorVideo = () => {
          console.log("error in getting doctorid at doctorvideo",err);
       }
    }
-   const { peer, SendOffer, RecieveAnswer, getCam } = usePeer();
-
+  
+   console.log("peer is",peer);
    const localVideoRef = useRef();
    const remoteVideoRef = useRef();
 
@@ -41,6 +41,7 @@ const DoctorVideo = () => {
 
    const SendMessage = async () => {
       const offer = await SendOffer();
+      console.log("offer is",offer);
       socket.emit('message', { type: 'create-Offer', sdp: offer,you:doctorBhai.username,other:username });
    };
 
@@ -62,7 +63,7 @@ const DoctorVideo = () => {
          }
       }
    };
-
+   
    useEffect(() => {
       GetDoctor();
       peer.onnegotiationneeded = SendMessage;
@@ -78,7 +79,7 @@ const DoctorVideo = () => {
          socket.off('create-answer', GetAnswer);
       };
    }, [doctorBhai,peer,socket]);
-
+   console.log("final peer is",peer);
    return (
       <div className="bg-gray-800 h-screen flex flex-col justify-center items-center text-white">
          <h1 className="text-4xl font-bold mb-6">Video Chat</h1>
