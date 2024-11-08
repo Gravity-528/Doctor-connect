@@ -29,7 +29,7 @@ const DoctorLogin = () => {
           value={formData.username}
           onChange={handleChange}
           required
-          className="px-4 py-2 rounded-md"
+          className="px-4 py-2 rounded-md text-black"
         />
         <input
           type="password"
@@ -38,14 +38,17 @@ const DoctorLogin = () => {
           value={formData.password}
           onChange={handleChange}
           required
-          className="px-4 py-2 rounded-md"
+          className="px-4 py-2 rounded-md text-black"
         />
+        <Link to={'/DoctorHome'}>
         <button
           type="submit"
           className="bg-white text-blue-500 px-6 py-3 rounded-md font-semibold hover:bg-gray-200 transition duration-300 ease-in-out"
         >
+
           Login
         </button>
+        </Link>
         <p>New to website <Link to='/doctorRegister' className='text-black'>Register</Link></p>
       </form>
     </div>

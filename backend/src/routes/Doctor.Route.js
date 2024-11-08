@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { AllDoctor, FindDoctorById, GetDoctorId, LoginDoctor, LogoutDoctor, registerDoctor, SlotAttend } from "../controllers/Doctor.controller.js";
+import { AllDoctor, DoctorBhai, FindDoctorById, GetDoctorId, GetUser, LoginDoctor, LogoutDoctor, registerDoctor, SlotAttend } from "../controllers/Doctor.controller.js";
 import { verifyAdmin } from "../middlewares/auth.middleware.js";
 import {upload} from "../middlewares/multer.middleware.js"
 
@@ -12,5 +12,7 @@ router.route("/doctorSlot").get(verifyAdmin,SlotAttend);
 router.route("/FindDoctorById").post(FindDoctorById);
 router.route("/allDoctor").get(AllDoctor);
 router.route("/doctorId").post(GetDoctorId);
+router.route("/fetchById").post(verifyAdmin,GetUser);
+router.route("/DoctorBhai").get(verifyAdmin,DoctorBhai);
 
-export default router
+export default router;

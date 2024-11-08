@@ -3,12 +3,23 @@ import { useSocket } from '../Providers/Socket';
 import { usePeer } from '../Providers/WebRTC';
 import { useParams } from 'react-router-dom';
 import { useData } from '../Providers/DataProvider';
+import axios from 'axios';
 
-const Video = () => {
+const DoctorVideo = () => {
    const {username}=useParams();
 
-   const {userById}=useData();
+   // const {userById}=useData();
+   const [doctorBhai,setDoctorBhai]=useState();
+   
    const socket = useSocket();
+   const GetDoctor=async()=>{
+      try{
+         const response=await axios.get("http://localhost:8000/api/v1/doctor/doctorBhai",{withCredentials:true});
+         setDoctorBhai(response.data.data);
+      }catch(error){
+         console.log("error in getting doctorid at doctorvideo",err);
+      }
+   }
    const { peer, SendOffer, RecieveAnswer, getCam } = usePeer();
 
    const localVideoRef = useRef();
@@ -29,13 +40,13 @@ const Video = () => {
 
    const SendMessage = async () => {
       const offer = await SendOffer();
-      socket.emit('message', { type: 'create-Offer', sdp: offer,you:userById,other:username });
+      socket.emit('message', { type: 'create-Offer', sdp: offer,you:doctorBhai.username,other:username });
    };
 
    const GetMessage = async (data) => {
       await peer.setRemoteDescription(data);
       const answer = await RecieveAnswer();
-      socket.emit('message', { type: 'create-answer', sdp: answer,you:userById,other:username });
+      socket.emit('message', { type: 'create-answer', sdp: answer,you:doctorBhai.username,other:username });
    };
 
    const GetAnswer = async (data) => {
@@ -52,6 +63,7 @@ const Video = () => {
    };
 
    useEffect(() => {
+      GetDoctor();
       peer.onnegotiationneeded = SendMessage;
       socket.on('create-offer', GetMessage);
       socket.on('create-answer', GetAnswer);
@@ -85,4 +97,4 @@ const Video = () => {
    );
 };
 
-export default Video;
+export default DoctorVideo;

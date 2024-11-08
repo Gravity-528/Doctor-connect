@@ -17,6 +17,9 @@ import LoginUser from "./Pages/LoginUser"
 import RegisterUser from "./Pages/RegisterUser"
 import SlotPage from "./Pages/SlotPage"
 import YourSlot from "./Pages/YourSlot"
+import DoctorNav from "./component/DoctorNav"
+import DoctorSlotAttend from "./Pages/DoctorSlotAttend"
+import DoctorVideo from "./component/DoctorVideo"
 
 
 
@@ -48,6 +51,10 @@ function App() {
       element:<Navbar/>
     },
     {
+      path:'/DoctorHome',
+      element:<DoctorNav/>
+    },
+    {
       path:'/SeeDoctor',
       element:<FindDoctor/>,
       // children:[
@@ -67,6 +74,12 @@ function App() {
     },{
       path:'/YourSlot/:username',
       element:<Video/>
+    },{
+      path:'/DoctorSlot',
+      element:<DoctorSlotAttend/>
+    },{
+      path:'/DoctorSlot/:username',
+      element:<DoctorVideo/>
     }
   ]);
 

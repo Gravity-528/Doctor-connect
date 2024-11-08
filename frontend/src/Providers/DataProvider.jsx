@@ -42,7 +42,7 @@ export const DataProvider=({children})=>{
     const LoginDoctorGet=async(username,password)=>{
         try{
            const response=await axios.post("http://localhost:8000/api/v1/doctor/loginDoctor",{username,password},{withCredentials:true});
-           const value=response.val;
+           const value=response.data.val;
         //    setIsAuth({valid:value.valid,role:value.role});
         setIsAuth({valid: value.valid, role: value.role });
         }catch(error){

@@ -7,7 +7,7 @@ const SlotSchema=new mongoose.Schema(
     ref:"Doctor"
    },
    Time:{
-    type:Date
+    type:String
    },
    price:{
     type:Number,

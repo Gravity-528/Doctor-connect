@@ -5,6 +5,7 @@ import {ApiResponse} from "../utils/ApiResponse.js";
 import {Slot} from "../models/Slot.js";
 import {uploadOnCloudinary} from "../utils/Cloudinary.js"
 import jwt from "jsonwebtoken";
+import { User } from "../models/User.js";
 
 const generateAccessAndRefreshTokens= async(doctorid)=>{
     try {
@@ -233,9 +234,9 @@ const editDoctor=asyncHandler(async(req,res)=>{
 const SlotAttend=asyncHandler(async(req,res)=>{
      const doctor=req.doctor._id;
      try{
-     const FindSlot=await Slot.find({Doctor:doctor}).populate('ToAttendSlot');
+     const FindSlot=await Slot.findById(doctor).populate('ToAttendSlot');
 
-     return res.status(200).json({msg:"Slot fetched Successfully",data:FindSlot});
+     return res.status(200).json({msg:"Slot fetched Successfully",data:FindSlot.ToAttendSlot});
      }catch(err){
         console.error("some error is here",err);
      }
@@ -281,4 +282,34 @@ const GetDoctorId=asyncHandler(async(req,res)=>{
     }
 })
 
-export {registerDoctor,LoginDoctor,LogoutDoctor,refreshAccesToken,editDoctor,SlotAttend,FindDoctorById,AllDoctor,GetDoctorId}
+const GetUser=asyncHandler(async(req,res)=>{
+    const {id}=req.body;
+
+    try{
+        const user=await User.findById(id);
+        if(!user){
+         return res.status(401).json({msg:"error is here in fetching the user by id"});
+        }
+        return res.status(200).json({data:user,msg:"fetched the user by id successfully"});
+       }catch(err){
+         console.error("error is here in fetching the user by id",err);
+         return res.status(500).json({msg:"error is here in fetching the user by id"});
+       }
+})
+
+const DoctorBhai=asyncHandler(async(req,res)=>{
+    const id=req.doctor._id;
+
+    try{
+        const user=await Doctor.findById(id);
+        if(!user){
+         return res.status(401).json({msg:"error is here in fetching the user by id"});
+        }
+        return res.status(200).json({data:user,msg:"fetched the user by id successfully"});
+       }catch(err){
+         console.error("error is here in fetching the user by id",err);
+         return res.status(500).json({msg:"error is here in fetching the user by id"});
+       }
+})
+
+export {registerDoctor,LoginDoctor,LogoutDoctor,refreshAccesToken,editDoctor,SlotAttend,FindDoctorById,AllDoctor,GetDoctorId,GetUser,DoctorBhai}

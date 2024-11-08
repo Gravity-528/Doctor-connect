@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Navbar = () => {
+const DoctorNav = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -14,7 +14,7 @@ const Navbar = () => {
           </div>
           <div className="hidden md:flex space-x-6 items-center">
             <a
-              href="/"
+              href="/DoctorSlot"
               className="text-gray-700 hover:text-gray-900 px-4 py-2 rounded-md text-base font-medium transition duration-300"
             >
               Your Slot
@@ -92,4 +92,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default DoctorNav;
