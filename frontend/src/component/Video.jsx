@@ -19,7 +19,7 @@ const Video = () => {
           const response=await axios.get('http://localhost:8000/api/v1/user/fetchById',{withCredentials:true});
           console.log(response);
           setUserById(response.data.data.username);
-          socket.on("register",{you:response.data.data.username});
+          
       } catch (error) {
           console.error("some frontend error in fetching userById",error);
       }
@@ -68,18 +68,40 @@ const Video = () => {
          }
       }
    };
-
+   useEffect(()=>{
+      socket.emit("register",{you:userById});
+   },[userById])
    useEffect(() => {
 
       GetUserId();
-      peer.onnegotiationneeded = SendMessage;
-      socket.on('create-offer', GetMessage);
-      socket.on('create-answer', GetAnswer);
+      peer.onnegotiationneeded = async () => {
+         const offer = await SendOffer();
+         socket.emit('message', { type: 'create-Offer', sdp: offer,you:userById,other:username });
+      };;
+      socket.on('create-offer', async (data) => {
+         console.log(data);
+         const {}=data;
+         await peer.setRemoteDescription(data);
+         const answer = await RecieveAnswer();
+         socket.emit('message', { type: 'create-answer', sdp: answer,you:userById,other:username });
+      });
+      socket.on('create-answer', async (data) => {
+         await peer.setRemoteDescription(data);
+      });
       
       SendLocalStream();
 
       peer.ontrack = ReceiveVideo;
+      peer.onicecandidate = (event) => {
+         if (event.candidate) {
+            socket.emit("message", {type:"candidate", sdp: event.candidate, you: userById, other: username });
+         }
+      };
 
+      socket.on("candidate", (data) => {
+         peer.addIceCandidate(new RTCIceCandidate(data.sdp))
+            .catch(err => console.error("Error adding received ICE candidate", err));
+      });
       return () => {
          socket.off('create-offer', GetMessage);
          socket.off('create-answer', GetAnswer);

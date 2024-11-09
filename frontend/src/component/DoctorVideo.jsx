@@ -16,12 +16,13 @@ const DoctorVideo = () => {
       try{
          const response=await axios.get("http://localhost:8000/api/v1/doctor/doctorBhai",{withCredentials:true});
          setDoctorBhai(response.data.data);
-         socket.emit("register",{you:response.data.data.username})
+         console.log(response.data.data);
+         socket.emit("register",{you:response.data.data.username});
       }catch(error){
          console.log("error in getting doctorid at doctorvideo",err);
       }
    }
-  
+   
    console.log("peer is",peer);
    const localVideoRef = useRef();
    const remoteVideoRef = useRef();
@@ -40,6 +41,7 @@ const DoctorVideo = () => {
    };
 
    const SendMessage = async () => {
+      console.log("start button is triggered")
       const offer = await SendOffer();
       console.log("offer is",offer);
       socket.emit('message', { type: 'create-Offer', sdp: offer,you:doctorBhai.username,other:username });
@@ -47,7 +49,11 @@ const DoctorVideo = () => {
 
    const GetMessage = async (data) => {
       await peer.setRemoteDescription(data);
-      const answer = await RecieveAnswer();
+      // const answer = await RecieveAnswer();
+      const answer=await peer.createAnswer();
+      peer.setLocalDescription(answer);
+        
+      console.log(peer.RemoteDescription)
       socket.emit('message', { type: 'create-answer', sdp: answer,you:doctorBhai.username,other:username });
    };
 
@@ -63,22 +69,53 @@ const DoctorVideo = () => {
          }
       }
    };
-   
+   // useEffect(()=>{
+   //    socket.emit("register",{you:doctorBhai.username});
+   //    console.log("doctorBhai is",doctorBhai);
+   // },[doctorBhai])
    useEffect(() => {
       GetDoctor();
-      peer.onnegotiationneeded = SendMessage;
-      socket.on('create-offer', GetMessage);
-      socket.on('create-answer', GetAnswer);
+      peer.onnegotiationneeded = async () => {
+         console.log("start button is triggered")
+         const offer = await SendOffer();
+         console.log("offer is",offer);
+         socket.emit('message', { type: 'create-Offer', sdp: offer,you:doctorBhai.username,other:username });
+      };
+      socket.on('create-offer',async (data) => {
+         console.log("data for create offer",data.sdp);
+         await peer.setRemoteDescription(data.sdp);
+         // const answer = await RecieveAnswer();
+         const answer=await peer.createAnswer();
+         await peer.setLocalDescription(answer);
+           
+         console.log(peer.RemoteDescription)
+         socket.emit('message', { type: 'create-answer', sdp: answer,you:doctorBhai.username,other:username });
+      } );
+      socket.on('create-answer',async (data) => {
+         console.log("data for create answer",data.sdp);
+         await peer.setRemoteDescription(data);
+      } );
 
       SendLocalStream();
 
       peer.ontrack = ReceiveVideo;
+      
+      peer.onicecandidate = (event) => {
+         if (event.candidate) {
+            socket.emit("message", {type:"candidate", sdp: event.candidate, you: doctorBhai?.username, other: username });
+         }
+      };
 
+      socket.on("candidate", (data) => {
+         console.log("data for candidate",data);
+         peer.addIceCandidate(new RTCIceCandidate(data))
+            .catch(err => console.error("Error adding received ICE candidate", err));
+      });
       return () => {
          socket.off('create-offer', GetMessage);
          socket.off('create-answer', GetAnswer);
       };
-   }, [doctorBhai,peer,socket]);
+   }, []);
    console.log("final peer is",peer);
    return (
       <div className="bg-gray-800 h-screen flex flex-col justify-center items-center text-white">

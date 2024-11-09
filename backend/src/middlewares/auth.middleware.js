@@ -47,7 +47,7 @@ const verifyAdmin = asyncHandler(async (req, res, next) => {
       }
   
   
-      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET1);
   
   
       const doctor = await Doctor.findById(decodedToken?._id).select("-password -refreshToken");
@@ -61,6 +61,7 @@ const verifyAdmin = asyncHandler(async (req, res, next) => {
       req.doctor = doctor;
       next();
     } catch (error) {
+      console.error("error in admin",error);
       throw new ApiError(401, error?.message || "Invalid Access Token");
     }
   });

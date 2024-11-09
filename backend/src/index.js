@@ -26,7 +26,7 @@ const map=new Map();
 io.on('connection',(socket)=>{
     console.log("server connected",socket.id);
     
-    socket.on('register',(you)=>{
+    socket.on('register',({you})=>{
         socket.userId=you;
         map.set(you,socket.id);
         console.log("user hashed successfully");
@@ -39,11 +39,14 @@ io.on('connection',(socket)=>{
         console.log("user disconnected");
     })
     socket.on('message',({type,sdp,you,other})=>{
+        const target=map.get(other);
         if(type=='create-Offer'){
-            socket.to(map[other]).emit('create-offer',sdp);
+            socket.to(target).emit('create-offer',sdp);
         }
         else if(type=='create-answer'){
-            socket.to(map[other]).emit('create-answer',sdp);
+            socket.to(target).emit('create-answer',sdp);
+        }else if(type=="candidate"){
+            socket.to(target).emit("candidate",sdp);
         }
     })
 })
