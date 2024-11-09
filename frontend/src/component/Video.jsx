@@ -111,27 +111,77 @@ const Video = () => {
       });
       socket.on("disconnect-peer",()=>{
          console.log("userSocket is disconnecting");
-         peer.close();
+         // peer.close();
          
-         if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-            localVideoRef.current.srcObject = null;  
-            setLocalStream(null);  
-         }
+         // if (localStream) {
+         //    localStream.getTracks().forEach(track => track.stop());
+         //    localVideoRef.current.srcObject = null;  
+         //    setLocalStream(null);  
+         // }
 
-         if (remoteStream) {
+         // if (remoteStream) {
+         //    remoteStream.getTracks().forEach(track => track.stop());  
+         //    remoteVideoRef.current.srcObject = null;  
+         //    setRemoteStream(null);  
+         // }
+         peer.close();
+         console.log("prev localStream",localStream);
+          if (localStream) {
+            localStream.getTracks().forEach(track => track.stop()); 
+            localVideoRef.current.srcObject = null;  
+            console.log("prev localRef is",localVideoRef.current.srcObject);
+            setLocalStream(null);} 
+
+            console.log("prev remoteStream",remoteStream); 
+          if (remoteStream) {
             remoteStream.getTracks().forEach(track => track.stop());  
-            remoteVideoRef.current.srcObject = null;  
+            remoteVideoRef.current.srcObject = null;
+            console.log("prev remoteRef is",remoteVideoRef.current.srcObject);
             setRemoteStream(null);  
          }
-         socket.off('create-offer', GetMessage);
-         socket.off('create-answer', GetAnswer);
+
+         if (localVideoRef.current) {
+            localVideoRef.current.srcObject = null;
+         }
+         if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = null;
+         }
+         console.log("localStream is",localStream);
+         console.log("localStream ref is",localVideoRef.current.srcObject);
+         console.log("remoteSRef is",remoteVideoRef.current.srcObject);
+         console.log("RemoteStream is",remoteStream);
+         // socket.off('create-offer', GetMessage);
+         // socket.off('create-answer', GetAnswer);
          navigate('/UserHome');
       })
-      return () => {
-         socket.off('create-offer', GetMessage);
-         socket.off('create-answer', GetAnswer);
-      };
+      
+         return () => {
+            console.log("Cleaning up video streams and peer connection on unmount");
+            
+            
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localVideoRef.current.srcObject = null;
+                setLocalStream(null);
+            }
+    
+            
+            if (remoteStream) {
+                remoteStream.getTracks().forEach(track => track.stop());
+                remoteVideoRef.current.srcObject = null;
+                setRemoteStream(null);
+            }
+    
+            
+            if (peer) {
+                peer.close();
+            }
+            
+            socket.off('create-offer', GetMessage);
+            socket.off('create-answer', GetAnswer);
+        };
+         
+      
    }, []);
 
    return (
