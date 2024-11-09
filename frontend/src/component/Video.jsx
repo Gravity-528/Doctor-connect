@@ -48,6 +48,12 @@ const Video = () => {
    const SendMessage = async () => {
       const offer = await SendOffer();
       socket.emit('message', { type: 'create-Offer', sdp: offer,you:userById,other:username });
+
+   //    setTimeout(()=>{
+   //       socket.emit('message',{type:'disconnect-peer',you:userById,other:username});
+   //       peer.close();
+   //       navigate('/UserHome')
+   //   },40*1000);
    };
 
    const GetMessage = async (data) => {
@@ -102,6 +108,21 @@ const Video = () => {
          peer.addIceCandidate(new RTCIceCandidate(data.sdp))
             .catch(err => console.error("Error adding received ICE candidate", err));
       });
+      socket.on("disconnect-peer",()=>{
+         peer.close();
+         socket.off('create-offer', GetMessage);
+         socket.off('create-answer', GetAnswer);
+         if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+            localVideoRef.current.srcObject = null;  
+            setLocalStream(null);  }
+         if (remoteStream) {
+            remoteStream.getTracks().forEach(track => track.stop());  
+            remoteVideoRef.current.srcObject = null;  
+            setRemoteStream(null);  
+         }
+         navigate('/UserHome');
+      })
       return () => {
          socket.off('create-offer', GetMessage);
          socket.off('create-answer', GetAnswer);

@@ -52,7 +52,7 @@ io.on('connection',(socket)=>{
             if(socket.userId){
                 map.delete(socket.userId);
             }
-            console.log("user disconnected");
+            console.log("user disconnected for disconnect peer");
         }
     })
 })

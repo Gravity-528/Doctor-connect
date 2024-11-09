@@ -1,13 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSocket } from '../Providers/Socket';
 import { usePeer } from '../Providers/WebRTC';
-import { useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useData } from '../Providers/DataProvider';
 import axios from 'axios';
 
 const DoctorVideo = () => {
    const {username}=useParams();
-   const { peer, SendOffer, RecieveAnswer, getCam } = usePeer();
+   const navigate=useNavigate();
+//    const peer=new RTCPeerConnection({
+//       iceServers:[
+//           {urls:'stun:stun.l.google.com:19302'}
+//       ]
+//   })
+   const {peer, SendOffer, RecieveAnswer, getCam } = usePeer();
    // const {userById}=useData();
    const [doctorBhai,setDoctorBhai]=useState();
    
@@ -47,7 +53,18 @@ const DoctorVideo = () => {
       socket.emit('message', { type: 'create-Offer', sdp: offer,you:doctorBhai.username,other:username });
       setTimeout(()=>{
           socket.emit('message',{type:'disconnect-peer',you:doctorBhai.username,other:username});
-      },40*60*1000);
+          peer.close();
+          if (localStream) {
+            localStream.getTracks().forEach(track => track.stop()); 
+            localVideoRef.current.srcObject = null;  
+            setLocalStream(null);}  
+          if (remoteStream) {
+            remoteStream.getTracks().forEach(track => track.stop());  
+            remoteVideoRef.current.srcObject = null;  
+            setRemoteStream(null);  
+         }
+          navigate('/DoctorHome')
+      },40*1000);
    };
 
    const GetMessage = async (data) => {
@@ -113,6 +130,18 @@ const DoctorVideo = () => {
       });
       socket.on("disconnect-peer",()=>{
          peer.close();
+         socket.off('create-offer', GetMessage);
+         socket.off('create-answer', GetAnswer);
+         if (localStream) {
+            localStream.getTracks().forEach(track => track.stop()); 
+            localVideoRef.current.srcObject = null;  
+            setLocalStream(null);  }
+         if (remoteStream) {
+            remoteStream.getTracks().forEach(track => track.stop());  
+            remoteVideoRef.current.srcObject = null;  
+            setRemoteStream(null);  
+         }
+         navigate('/DoctorHome')
       })
       return () => {
          socket.off('create-offer', GetMessage);
