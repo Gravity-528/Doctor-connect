@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSocket } from '../Providers/Socket';
 import { usePeer } from '../Providers/WebRTC';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useData } from '../Providers/DataProvider';
 
 const Video = () => {
+   const navigate=useNavigate();
    const {isAuth}=useData();
    const {username}=useParams();
    console.log("username route is",username);
@@ -109,18 +110,22 @@ const Video = () => {
             .catch(err => console.error("Error adding received ICE candidate", err));
       });
       socket.on("disconnect-peer",()=>{
+         console.log("userSocket is disconnecting");
          peer.close();
-         socket.off('create-offer', GetMessage);
-         socket.off('create-answer', GetAnswer);
+         
          if (localStream) {
             localStream.getTracks().forEach(track => track.stop());
             localVideoRef.current.srcObject = null;  
-            setLocalStream(null);  }
+            setLocalStream(null);  
+         }
+
          if (remoteStream) {
             remoteStream.getTracks().forEach(track => track.stop());  
             remoteVideoRef.current.srcObject = null;  
             setRemoteStream(null);  
          }
+         socket.off('create-offer', GetMessage);
+         socket.off('create-answer', GetAnswer);
          navigate('/UserHome');
       })
       return () => {
