@@ -47,6 +47,12 @@ io.on('connection',(socket)=>{
             socket.to(target).emit('create-answer',sdp);
         }else if(type=="candidate"){
             socket.to(target).emit("candidate",sdp);
+        }else if(type=="disconnect-peer"){
+            socket.to(target).emit("disconnect-peer");
+            if(socket.userId){
+                map.delete(socket.userId);
+            }
+            console.log("user disconnected");
         }
     })
 })

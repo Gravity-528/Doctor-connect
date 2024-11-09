@@ -45,6 +45,9 @@ const DoctorVideo = () => {
       const offer = await SendOffer();
       console.log("offer is",offer);
       socket.emit('message', { type: 'create-Offer', sdp: offer,you:doctorBhai.username,other:username });
+      setTimeout(()=>{
+          socket.emit('message',{type:'disconnect-peer',you:doctorBhai.username,other:username});
+      },40*60*1000);
    };
 
    const GetMessage = async (data) => {
@@ -69,10 +72,7 @@ const DoctorVideo = () => {
          }
       }
    };
-   // useEffect(()=>{
-   //    socket.emit("register",{you:doctorBhai.username});
-   //    console.log("doctorBhai is",doctorBhai);
-   // },[doctorBhai])
+   
    useEffect(() => {
       GetDoctor();
       peer.onnegotiationneeded = async () => {
@@ -111,6 +111,9 @@ const DoctorVideo = () => {
          peer.addIceCandidate(new RTCIceCandidate(data))
             .catch(err => console.error("Error adding received ICE candidate", err));
       });
+      socket.on("disconnect-peer",()=>{
+         peer.close();
+      })
       return () => {
          socket.off('create-offer', GetMessage);
          socket.off('create-answer', GetAnswer);

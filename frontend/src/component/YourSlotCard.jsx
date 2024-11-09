@@ -32,7 +32,7 @@ const timeStr = date.toLocaleTimeString('en-US', {
   
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 max-w-sm mx-auto mt-6">
-      <h2 className="text-2xl font-bold mb-2">Slot at {timeStr} by {DoctorName.name}</h2>
+      <h2 className="text-2xl font-bold mb-2">Slot at {props.Time} by {DoctorName.name}</h2>
       <p className="text-gray-600 mb-4">{DoctorName.qualification}</p>
       <p className="text-gray-600 mb-4">{timeStr}</p>
       {/* <p className="text-gray-600 mb-4">Date: November 15, 2024</p> */}
