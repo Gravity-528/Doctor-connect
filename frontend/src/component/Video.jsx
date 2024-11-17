@@ -32,6 +32,8 @@ const Video = () => {
 
    const localVideoRef = useRef();
    const remoteVideoRef = useRef();
+   const localStreamRef=useRef();
+   const remoteStreamRef=useRef();
 
    const [localStream, setLocalStream] = useState(null);
    const [remoteStream, setRemoteStream] = useState(null);
@@ -39,7 +41,7 @@ const Video = () => {
    const SendLocalStream = async () => {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
       setLocalStream(stream);
-
+      localStreamRef.current = stream;
       if (localVideoRef.current) {
          localVideoRef.current.srcObject = stream;
       }
@@ -70,6 +72,7 @@ const Video = () => {
    const ReceiveVideo = (event) => {
       if (!remoteStream) {
          setRemoteStream(event.streams[0]);
+         remoteStreamRef.current=event.streams[0];
          if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = event.streams[0];
          }
@@ -78,6 +81,7 @@ const Video = () => {
    useEffect(()=>{
       socket.emit("register",{you:userById});
    },[userById])
+
    useEffect(() => {
 
       GetUserId();
@@ -109,73 +113,75 @@ const Video = () => {
          peer.addIceCandidate(new RTCIceCandidate(data.sdp))
             .catch(err => console.error("Error adding received ICE candidate", err));
       });
+      console.log("extra prev localStream",localStream);
+      console.log("extra prev remoteStream",remoteStream);
+
       socket.on("disconnect-peer",()=>{
-         console.log("userSocket is disconnecting");
-         // peer.close();
-         
-         // if (localStream) {
-         //    localStream.getTracks().forEach(track => track.stop());
-         //    localVideoRef.current.srcObject = null;  
-         //    setLocalStream(null);  
-         // }
 
-         // if (remoteStream) {
-         //    remoteStream.getTracks().forEach(track => track.stop());  
-         //    remoteVideoRef.current.srcObject = null;  
-         //    setRemoteStream(null);  
-         // }
-         peer.close();
-         console.log("prev localStream",localStream);
-          if (localStream) {
-            localStream.getTracks().forEach(track => track.stop()); 
-            localVideoRef.current.srcObject = null;  
+         console.log("userSocket is disconnecting for socket25sec");
+         console.log("prev localStreamRef",localStreamRef.current);
+          if (localStreamRef.current) {
+            // localStream.getTracks().forEach(track => track.stop()); 
+            localStreamRef.current.getTracks().forEach(track => track.stop());
+            localVideoRef.current.srcObject = null;
+            localStreamRef.current = null;
+            
             console.log("prev localRef is",localVideoRef.current.srcObject);
-            setLocalStream(null);} 
+            setLocalStream(null);
+         
+         } 
 
-            console.log("prev remoteStream",remoteStream); 
-          if (remoteStream) {
-            remoteStream.getTracks().forEach(track => track.stop());  
+            console.log("prev remoteStreamRef",remoteStreamRef.current); 
+          if (remoteStreamRef.current) {
+            remoteStreamRef.current.getTracks().forEach(track => track.stop());  
             remoteVideoRef.current.srcObject = null;
+            remoteStreamRef.current=null;
             console.log("prev remoteRef is",remoteVideoRef.current.srcObject);
             setRemoteStream(null);  
          }
 
-         if (localVideoRef.current) {
-            localVideoRef.current.srcObject = null;
-         }
-         if (remoteVideoRef.current) {
-            remoteVideoRef.current.srcObject = null;
-         }
+         // if (localVideoRef.current) {
+         //    localVideoRef.current.srcObject = null;
+         // }
+         // if (remoteVideoRef.current) {
+         //    remoteVideoRef.current.srcObject = null;
+         // }
          console.log("localStream is",localStream);
-         console.log("localStream ref is",localVideoRef.current.srcObject);
-         console.log("remoteSRef is",remoteVideoRef.current.srcObject);
+         console.log("localStream ref is",localStreamRef.current);
+         console.log("remoteSRef is",remoteStreamRef.current);
          console.log("RemoteStream is",remoteStream);
-         // socket.off('create-offer', GetMessage);
-         // socket.off('create-answer', GetAnswer);
+         socket.off('create-offer', GetMessage);
+         socket.off('create-answer', GetAnswer);
+         peer.close();
          navigate('/UserHome');
       })
       
          return () => {
             console.log("Cleaning up video streams and peer connection on unmount");
             
+            console.log("cleanup localStream",localStream);
+            //  if (localStream) {
+            //     localStream.getTracks().forEach(track => track.stop());
+            //     localVideoRef.current.srcObject = null;
+            //    setLocalStream(null);
+            // }
+            console.log("cleanup remoteStream",remoteStream);
             
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-                localVideoRef.current.srcObject = null;
-                setLocalStream(null);
-            }
-    
+            // if (remoteStream) {
+            //     remoteStream.getTracks().forEach(track => track.stop());
+            //     remoteVideoRef.current.srcObject = null;
+            //     setRemoteStream(null);
+            // }
+            // if (localVideoRef.current) {
+            //    localVideoRef.current.srcObject = null;
+            // }
+            // if (remoteVideoRef.current) {
+            //    remoteVideoRef.current.srcObject = null;
+            // }
             
-            if (remoteStream) {
-                remoteStream.getTracks().forEach(track => track.stop());
-                remoteVideoRef.current.srcObject = null;
-                setRemoteStream(null);
-            }
-    
-            
-            if (peer) {
-                peer.close();
-            }
+            // if (peer) {
+            //     peer.close();
+            // }
             
             socket.off('create-offer', GetMessage);
             socket.off('create-answer', GetAnswer);
@@ -183,7 +189,8 @@ const Video = () => {
          
       
    }, []);
-
+   console.log("localstream",localStream);
+   console.log("remoteStream",remoteStream);
    return (
       <div className="bg-gray-800 h-screen flex flex-col justify-center items-center text-white">
          <h1 className="text-4xl font-bold mb-6">Video Chat</h1>
@@ -194,11 +201,12 @@ const Video = () => {
             <video ref={remoteVideoRef} autoPlay className="w-72 h-40 bg-gray-700 rounded-md border border-white" />
          </div>
          
-         <div className="flex space-x-4 mt-8">
+         {/* <div className="flex space-x-4 mt-8">
             <button onClick={SendMessage} className="bg-blue-500 text-white px-6 py-3 rounded-md font-semibold hover:bg-blue-600 transition duration-300 ease-in-out">
                Start Call
             </button>
-         </div>
+         </div> */}
+         <div className="flex space-x-4 mt-8">Wait For Your Call</div>
       </div>
    );
 };

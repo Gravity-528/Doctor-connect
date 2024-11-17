@@ -54,6 +54,9 @@ const DoctorVideo = () => {
       setTimeout(()=>{
           socket.emit('message',{type:'disconnect-peer',you:doctorBhai.username,other:username});
           peer.close();
+          console.log(localStream);
+          console.log(remoteStream);
+          
           if (localStream) {
             localStream.getTracks().forEach(track => track.stop()); 
             localVideoRef.current.srcObject = null;  
@@ -64,7 +67,7 @@ const DoctorVideo = () => {
             setRemoteStream(null);  
          }
           navigate('/DoctorHome')
-      },40*1000);
+      },25*1000);
    };
 
    const GetMessage = async (data) => {
