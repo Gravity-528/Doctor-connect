@@ -29,14 +29,13 @@ const timeStr = date.toLocaleTimeString('en-US', {
   useEffect(()=>{
     GetData();
   },[])
-  
+  console.log(props.Time);
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 max-w-sm mx-auto mt-6">
       <h2 className="text-2xl font-bold mb-2">Slot at {props.Time} by {DoctorName.name}</h2>
       <p className="text-gray-600 mb-4">{DoctorName.qualification}</p>
       <p className="text-gray-600 mb-4">{timeStr}</p>
       {/* <p className="text-gray-600 mb-4">Date: November 15, 2024</p> */}
-      
       <button className="bg-blue-500 text-white px-4 py-2 rounded-md font-semibold hover:bg-blue-600 transition duration-300 ease-in-out">
        <Link to={`/YourSlot/${DoctorName.username}`}>
         Start Call

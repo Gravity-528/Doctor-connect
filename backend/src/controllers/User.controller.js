@@ -212,4 +212,17 @@ const GetUserById=asyncHandler(async(req,res)=>{
   }
 })
 
-export {registerUser,LoginUser,LogoutUser,refreshAccesToken,editUser,FetchBookedSlot,FetchDoctorByUserName,GetUserById};
+const GetUserByUserName=asyncHandler(async(req,res)=>{
+    const {username}=req.body;
+    console.log("username backend--------------------------------------",username);
+    try {
+        const fetchUser=await User.find({username:username});
+        console.log("fetching fetching",fetchUser);
+        return res.status(200).json({msg:"userId fetched successfully",data:fetchUser});
+    } catch (error) {
+        console.error("some error in backend for fetching userId",error);
+        res.status(500).json("error in backend in fetching userId");
+    }
+})
+
+export {registerUser,LoginUser,LogoutUser,refreshAccesToken,editUser,FetchBookedSlot,FetchDoctorByUserName,GetUserById,GetUserByUserName};

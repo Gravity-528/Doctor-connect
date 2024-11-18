@@ -15,6 +15,7 @@ const Video = () => {
    console.log("isAuth is",isAuth);
    const socket = useSocket();
    console.log("your socket is",socket);
+   
    const GetUserId=async()=>{
       try {
           const response=await axios.get('http://localhost:8000/api/v1/user/fetchById',{withCredentials:true});

@@ -79,7 +79,7 @@ function App() {
       path:'/DoctorSlot',
       element:<DoctorSlotAttend/>
     },{
-      path:'/DoctorSlot/:username',
+      path:'/DoctorSlot/:total',
       element:<DoctorVideo/>
     }
   ]);
