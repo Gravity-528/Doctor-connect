@@ -20,6 +20,7 @@ const DoctorVideo = () => {
 //           {urls:'stun:stun.l.google.com:19302'}
 //       ]
 //   })
+
    const {peer, SendOffer, RecieveAnswer, getCam } = usePeer();
    // const {userById}=useData();
    const [doctorBhai,setDoctorBhai]=useState();
