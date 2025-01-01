@@ -7,7 +7,7 @@ const SlotCard = ({ props }) => {
   const BookSlot = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/v1/Slot/bookSlot",
+        "/api/v1/Slot/bookSlot",
         { DoctorId: props.Doctor, time: props.Time },
         { withCredentials: true }
       );

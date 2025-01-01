@@ -15,7 +15,7 @@ const timeStr = date.toLocaleTimeString('en-US', {
 
   const GetData=async()=>{
     try {
-      const response=await axios.post("http://localhost:8000/api/v1/doctor/doctorId",{id:props.Doctor},{withCredentials:true});
+      const response=await axios.post("/api/v1/doctor/doctorId",{id:props.Doctor},{withCredentials:true});
       console.log(response);
      setDoctorName(response.data.data);
       

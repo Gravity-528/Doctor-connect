@@ -3,12 +3,22 @@ import Razorpay from "razorpay"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import { User } from "../models/User.js";
 import { Doctor } from "../models/Doctor.js";
+import {Queue} from "bullmq"
+import IORedis from "ioredis"
+
+const connection = new IORedis({
+  host: 'localhost',
+  port: 6379, 
+  maxRetriesPerRequest: null,
+});
 
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID, 
   key_secret: process.env.RAZORPAY_KEY_SECRET 
 });
+
+const unBookQueue=new Queue('unbook-queue',connection);
 
 const fetchSlot=asyncHandler(async(req,res)=>{
   try{
@@ -78,8 +88,13 @@ const bookSlot = asyncHandler(async (req, res) => {
       session.endSession();
       return res.status(500).json({ msg: "Some internal error occurred, please try again later" });
     }
-
-    
+    console.log("adding to the queue");
+    unBookQueue.add('unbooking',{DoctorId,userId,time,slotid:locked._id},{
+      delay:  15 * 1000, 
+    });
+    // unBookQueue.getJobs().then(jobs => {
+    //   console.log("Jobs in queue:", jobs.data);
+    // });
     await session.commitTransaction();
     session.endSession();
 
@@ -116,8 +131,6 @@ const unBookSlot=asyncHandler(async(req,res)=>{
     }
 
     try{
-    
-
     const user=await User.findByIdAndUpdate(
       userId,
       {$pull:{YourSlot:slotid}},

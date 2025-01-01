@@ -10,7 +10,7 @@ const YourSlot = () => {
     const [UserSlot,setUserSlot]=useState([]);
     const GetUserSlot=async()=>{
       try{
-          const YourSlot=await axios.get('http://localhost:8000/api/v1/user/getSlot',{withCredentials:true});
+          const YourSlot=await axios.get('/api/v1/user/getSlot',{withCredentials:true});
           // console.log("YourSlot is",YourSlot)
           setUserSlot(YourSlot.data.data);
           }catch(err){

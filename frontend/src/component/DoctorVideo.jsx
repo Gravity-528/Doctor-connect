@@ -31,7 +31,7 @@ const DoctorVideo = () => {
 
    // const GetDoctor=async()=>{
    //    try{
-   //       const response=await axios.get("http://localhost:8000/api/v1/doctor/doctorBhai",{withCredentials:true});
+   //       const response=await axios.get("/api/v1/doctor/doctorBhai",{withCredentials:true});
    //       setDoctorBhai(response.data.data);
    //       setDoctorId(response.data.data._id);
    //       console.log("doctor response is---------------------------",response.data.data._id);
@@ -43,7 +43,7 @@ const DoctorVideo = () => {
    // const askForSlot=async()=>{
    //    try{
    //       console.log("doctorId is......................",doctorId);
-   //    const response=await axios.post("http://localhost:8000/api/v1/Slot/askSlotId",{time,doctorId:doctorBhai._id},{withCredentials:true});
+   //    const response=await axios.post("/api/v1/Slot/askSlotId",{time,doctorId:doctorBhai._id},{withCredentials:true});
    //    console.log("slotFront-----------------------------------------",response);
    //    setSlotId(response.data.data);
    //    }catch(err){
@@ -52,7 +52,7 @@ const DoctorVideo = () => {
    // }
    // const findUserByUsername=async()=>{
    //    try {
-   //       const response=await axios.post("http://localhost:8000/api/v1/user/userUsername",{username},{withCredentials:true});
+   //       const response=await axios.post("/api/v1/user/userUsername",{username},{withCredentials:true});
    //       console.log("userFrontend----------------------------------------",response);
    //       setUserId(response.data.data);
 
@@ -63,7 +63,7 @@ const DoctorVideo = () => {
    const UnBookSlot=async()=>{
       try {
          console.log("useris-----------------------",userId,slotid);
-         const response=await axios.post("http://localhost:8000/api/v1/Slot/unBookSlot",{slotid,userId},{withCredentials:true});
+         const response=await axios.post("/api/v1/Slot/unBookSlot",{slotid,userId},{withCredentials:true});
          console.log("unbook slot response is----------------------------------------",response);
       } catch (error) {
          console.error("some error is here is unBooking the Slot frontend",error);
@@ -148,7 +148,7 @@ const DoctorVideo = () => {
    useEffect(() => {
       const fetchData=async()=>{
       try{
-         const response=await axios.get("http://localhost:8000/api/v1/doctor/doctorBhai",{withCredentials:true});
+         const response=await axios.get("/api/v1/doctor/doctorBhai",{withCredentials:true});
          setDoctorBhai(response.data.data);
          setDoctorId(response.data.data._id);
          console.log("doctor response is---------------------------",response.data.data._id);
@@ -156,11 +156,11 @@ const DoctorVideo = () => {
          console.log("doctorId is......................",doctorId);
 
 
-         const slotId=await axios.post("http://localhost:8000/api/v1/Slot/askSlotId",{time,doctorId:response.data.data._id},{withCredentials:true});
+         const slotId=await axios.post("/api/v1/Slot/askSlotId",{time,doctorId:response.data.data._id},{withCredentials:true});
          console.log("slotFront-----------------------------------------",slotId.data.data[0]);
          setSlotId(slotId.data.data[0]._id);
 
-         const response3=await axios.post("http://localhost:8000/api/v1/user/userUsername",{username},{withCredentials:true});
+         const response3=await axios.post("/api/v1/user/userUsername",{username},{withCredentials:true});
          console.log("userFrontend----------------------------------------",response3.data.data[0]);
          setUserId(response3.data.data[0]._id);
 

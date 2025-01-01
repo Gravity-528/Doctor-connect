@@ -8,7 +8,7 @@ const DoctorSlotCard = ({props}) => {
 
   const GetPatient=async()=>{
     try{
-    const response=await axios.post("http://localhost:8000/api/v1/doctor/fetchById",{id:props.Patient},{withCredentials:true});
+    const response=await axios.post("/api/v1/doctor/fetchById",{id:props.Patient},{withCredentials:true});
     console.log(response);
     setPatient(response.data.data);
     }catch(err){

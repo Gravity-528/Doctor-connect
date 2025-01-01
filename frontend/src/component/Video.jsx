@@ -18,7 +18,7 @@ const Video = () => {
    
    const GetUserId=async()=>{
       try {
-          const response=await axios.get('http://localhost:8000/api/v1/user/fetchById',{withCredentials:true});
+          const response=await axios.get('/api/v1/user/fetchById',{withCredentials:true});
           console.log(response);
           setUserById(response.data.data.username);
           

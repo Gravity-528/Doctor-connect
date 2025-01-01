@@ -9,7 +9,7 @@ const SlotPage = () => {
   const [doctor,setDoctor]=useState([]);
   
   const fetchData=async()=>{
-     const response=await axios.post('http://localhost:8000/api/v1/doctor/FindDoctorById',{username},{withCredentials:true});
+     const response=await axios.post('/api/v1/doctor/FindDoctorById',{username},{withCredentials:true});
      setDoctor(response.data.data);
      
   }

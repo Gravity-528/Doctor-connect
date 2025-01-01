@@ -14,7 +14,7 @@ const FindDoctor = () => {
   
   const GetAllDoctor=async()=>{
     try {
-        const response=await axios.get('http://localhost:8000/api/v1/doctor/allDoctor',{withCredentials:true});
+        const response=await axios.get('/api/v1/doctor/allDoctor',{withCredentials:true});
         setDoctor(response.data.data);
         
         alert("doctor fetched successfully");

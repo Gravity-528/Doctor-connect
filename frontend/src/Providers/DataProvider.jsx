@@ -19,7 +19,7 @@ export const DataProvider=({children})=>{
 
     const RegisterUserGet=async(name,username,password,email)=>{
         try {
-            const response=await axios.post("http://localhost:8000/api/v1/user/register",{name,username,password,email},{withCredentials:true});
+            const response=await axios.post("/api/v1/user/register",{name,username,password,email},{withCredentials:true});
             if(!response){
                 console.error("error in registering user try again");
             }
@@ -30,7 +30,7 @@ export const DataProvider=({children})=>{
     
     const LoginUserGet=async(username,password)=>{
         try{
-           const response=await axios.post("http://localhost:8000/api/v1/user/login",{username,password},{withCredentials:true});
+           const response=await axios.post("/api/v1/user/login",{username,password},{withCredentials:true});
            const value=response.data.val;
            console.log("value is",response.data.val);
            setIsAuth({valid:value.valid,role:value.role});
@@ -41,7 +41,7 @@ export const DataProvider=({children})=>{
     }
     const LoginDoctorGet=async(username,password)=>{
         try{
-           const response=await axios.post("http://localhost:8000/api/v1/doctor/loginDoctor",{username,password},{withCredentials:true});
+           const response=await axios.post("/api/v1/doctor/loginDoctor",{username,password},{withCredentials:true});
            const value=response.data.val;
         //    setIsAuth({valid:value.valid,role:value.role});
         setIsAuth({valid: value.valid, role: value.role });
@@ -51,7 +51,7 @@ export const DataProvider=({children})=>{
     }
     const RegisterDoctorGet=async(data)=>{
         try {
-            const response=await axios.post("http://localhost:8000/api/v1/doctor/registerDoctor",data,{withCredentials:true});
+            const response=await axios.post("/api/v1/doctor/registerDoctor",data,{withCredentials:true});
             if(!response){
                 console.error("error in registering user try again");
             }
@@ -70,7 +70,7 @@ export const DataProvider=({children})=>{
 
     const GetDoctorSlot=async()=>{
         try{
-        const OtherSlot=await axios.get('http://localhost:8000/api/v1/doctor/doctorSlot',{withCredentials:true});
+        const OtherSlot=await axios.get('/api/v1/doctor/doctorSlot',{withCredentials:true});
         setDoctorSlot(OtherSlot.data);
         }catch(err){
             console.error("error in fetching OtherSlot",err);
@@ -78,7 +78,7 @@ export const DataProvider=({children})=>{
     }
     // const GetAllDoctor=async()=>{
     //     try {
-    //         const response=await axios.get('http://localhost:8000/api/v1/doctor/allDoctor',{withCredentials:true});
+    //         const response=await axios.get('/api/v1/doctor/allDoctor',{withCredentials:true});
     //         setDoctor(response.data);
     //     } catch (error) {
     //         console.error("error in fetching the doctor",error);
@@ -95,7 +95,7 @@ export const DataProvider=({children})=>{
 
     const GetAllSlot=async()=>{
         try {
-            const fetchSlot=await axios.get('http://localhost:8000/api/v1/Slot/AllSlot',{withCredentials:true});
+            const fetchSlot=await axios.get('/api/v1/Slot/AllSlot',{withCredentials:true});
             setAllSlot(fetchSlot.data);
         } catch (error) {
             console.error("error in fetching all slots",error);

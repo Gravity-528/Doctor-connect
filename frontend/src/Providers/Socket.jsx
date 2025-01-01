@@ -12,7 +12,7 @@ export const SocketProvider = (props) => {
   const [socket, setSocket] = useState(null);
   const [userId,setUserId]=useState([]);
   // const UserFetch=async()=>{
-  //   const response=await axios.get("http://localhost:8000/api/v1/user/fetchById",{withCredentials:true});
+  //   const response=await axios.get("/api/v1/user/fetchById",{withCredentials:true});
   //   setUserId(response.data.data.username);
 
   //   socket.emit("register",{you:userId});
