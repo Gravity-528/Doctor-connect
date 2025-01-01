@@ -11,41 +11,28 @@ import IORedis from "ioredis"
 // import mongoose from "mongoose";
 import connectDb from "../src/database/index.js"
 
-// const MONGODB_URI='mongodb+srv://garvitraj004:ivNpZq3Gcy4ZUj30@cluster0.ebprw.mongodb.net'
-// const DB_NAME='MENTORS_CONNECT'
-// const connectDb=async()=>{
-//     try {
-//         await mongoose.connect(`${MONGODB_URI}/${DB_NAME}`,{serverSelectionTimeoutMS: 30000, useNewUrlParser: true, useUnifiedTopology: true,});
-//         console.log("-------------------->",`${MONGODB_URI}/${DB_NAME}`)
-//         console.log(`DB connected successfully,`)
-        
-//     } catch (error) {
-//         console.log("-------------------->",`${MONGODB_URI}/${DB_NAME}`)
-//         console.error("there is error in connecting the database",error);
-//     }
-// }
-// const pathF=path.join(__dirname, '..', '.env');
-// console.log(pathF);
-// const connectDb=async()=>{
-//     try {
-//         await mongoose.connect(`${process.env.MONGODB_URI}/${process.env.DB_NAME}`,{serverSelectionTimeoutMS: 30000, useNewUrlParser: true, useUnifiedTopology: true,});
-//         console.log("-------------------->",`${process.env.MONGODB_URI}/${process.env.DB_NAME}`)
-//         console.log(`DB connected successfully,`)
-        
-//     } catch (error) {
-//         console.log("-------------------->",`${process.env.MONGODB_URI}/${process.env.DB_NAME}`)
-//         console.error("there is error in connecting the database",error);
-//     }
-// }
 (async () => {
   await connectDb();
 })();
 
-const connection = new IORedis({
-    host: 'localhost',
-    port: 6379, 
-    maxRetriesPerRequest: null,
-  });
+// const connection = new IORedis({
+//     host: 'localhost',
+//     port: 6379, 
+//     maxRetriesPerRequest: null,
+//   });
+const connection = new IORedis(process.env.REDIS_URI, {
+  maxRetriesPerRequest: null,
+});
+
+connection.on('connect', () => {
+  console.log('Connected to Redis');
+});
+
+console.log("process env consumer",process.env.REDIS_URI)
+
+connection.on('error', (err) => {
+  console.error('Error connecting to Redis:', err);
+});
 
   console.log("starting the worker");
 

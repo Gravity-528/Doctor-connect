@@ -1,3 +1,7 @@
+import dotenv from "dotenv"
+dotenv.config({
+  path: "../.env"
+});
 import {Slot} from "../models/Slot.js"
 import Razorpay from "razorpay"
 import {asyncHandler} from "../utils/asyncHandler.js"
@@ -6,19 +10,18 @@ import { Doctor } from "../models/Doctor.js";
 import {Queue} from "bullmq"
 import IORedis from "ioredis"
 
-const connection = new IORedis({
-  host: 'localhost',
-  port: 6379, 
+const connection = new IORedis(process.env.REDIS_URI, {
   maxRetriesPerRequest: null,
 });
-
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID, 
   key_secret: process.env.RAZORPAY_KEY_SECRET 
 });
 
-const unBookQueue=new Queue('unbook-queue',connection);
+const unBookQueue=new Queue('unbook-queue',{connection});
+unBookQueue.on("connect",()=>{console.log("connected successfully")})
+unBookQueue.on("error",(err)=>{console.log("error is here in queue",err)})
 
 const fetchSlot=asyncHandler(async(req,res)=>{
   try{
