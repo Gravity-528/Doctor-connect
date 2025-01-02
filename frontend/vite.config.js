@@ -5,7 +5,7 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   server: {
     proxy: {
-      "/api": "https://doctor-connect-2.onrender.com",
+      "/api": "https://doctor-connect-3backend.onrender.com",
     },
   },
   plugins: [react()],
