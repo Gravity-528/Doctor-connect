@@ -19,7 +19,7 @@ export const SocketProvider = (props) => {
   // }
 
   useEffect(() => {
-    const socketInstance = io('http://localhost:8000');
+    const socketInstance = io('https://doctor-connect-3backend.onrender.com');
     setSocket(socketInstance);
     
     
