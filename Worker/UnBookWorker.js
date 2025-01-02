@@ -1,15 +1,15 @@
 import dotenv from "dotenv"
 dotenv.config({
-  path: "../.env"
+  path: "./.env"
 });
 import {Worker} from "bullmq";
-import { Doctor } from "../src/models/Doctor.js";
-import { User } from "../src/models/User.js";
-import { Slot } from "../src/models/Slot.js";
+import { Doctor } from "../Worker/Doctor.js";
+import { User } from "../Worker/User.js";
+import { Slot } from "../Worker/Slot.js";
 import IORedis from "ioredis"
 
 // import mongoose from "mongoose";
-import connectDb from "../src/database/index.js"
+import connectDb from "../Worker/index.js"
 
 (async () => {
   await connectDb();
@@ -23,6 +23,8 @@ import connectDb from "../src/database/index.js"
 const connection = new IORedis(process.env.REDIS_URI, {
   maxRetriesPerRequest: null,
 });
+
+console.log(process.env.REDIS_URI);
 
 connection.on('connect', () => {
   console.log('Connected to Redis');
