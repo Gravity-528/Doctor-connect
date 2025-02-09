@@ -20,6 +20,10 @@ const DoctorSchema=new mongoose.Schema(
       type:String,
       required:[true,"your image is required"]
    },
+   Specialisation:{
+      type:String,
+      required:[true,"mention your specialisation"]
+   },
    username:{
     type:String,
     required:[true,"username is required"]

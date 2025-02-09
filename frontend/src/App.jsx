@@ -20,6 +20,9 @@ import YourSlot from "./Pages/YourSlot"
 import DoctorNav from "./component/DoctorNav"
 import DoctorSlotAttend from "./Pages/DoctorSlotAttend"
 import DoctorVideo from "./component/DoctorVideo"
+import UserAnalytics from "./Pages/DashBoard"
+import DoctorDashboard from "./Pages/DoctorDashboard"
+import AboutDoctor from "./Pages/AboutDoctor"
 
 
 
@@ -48,11 +51,11 @@ function App() {
     },
     {
       path:'/UserHome',
-      element:<Navbar/>
+      element:<UserAnalytics/>
     },
     {
       path:'/DoctorHome',
-      element:<DoctorNav/>
+      element:<DoctorDashboard/>
     },
     {
       path:'/SeeDoctor',
@@ -66,7 +69,7 @@ function App() {
     },
     {
       path:'/SeeDoctor/:username',
-      element:<SlotPage/>
+      element:<AboutDoctor/>
     },
     {
       path:'/YourSlot',

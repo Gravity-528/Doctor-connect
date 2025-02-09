@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useData } from '../Providers/DataProvider';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
 
 const DoctorLogin = () => {
-  const navigate=useNavigate();
-  const {LoginDoctorGet}=useData();
+  const navigate = useNavigate();
+  const { LoginDoctorGet } = useData();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,48 +24,80 @@ const DoctorLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    LoginDoctorGet(formData.username,formData.password).then(()=>{
-      navigate('/DoctorHome')
-    }).catch((err)=>{
-      console.error("error in login frontend",err);
-    });
+    setLoading(true);
+    try {
+      await LoginDoctorGet(formData.username, formData.password);
+      navigate('/DoctorHome');
+    } catch (error) {
+      console.error('Login failed:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="bg-blue-500 h-screen flex flex-col justify-center items-center text-white">
-      <h1 className="text-5xl font-bold mb-6">Doctor Login</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-        <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={handleChange}
-          required
-          className="px-4 py-2 rounded-md text-black"
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-          className="px-4 py-2 rounded-md text-black"
-        />
-        {/* <Link to={'/DoctorHome'}> */}
-        <button
-          type="submit"
-          className="bg-white text-blue-500 px-6 py-3 rounded-md font-semibold hover:bg-gray-200 transition duration-300 ease-in-out"
-        >
+    <div className={cn('flex flex-col gap-6 text-white min-h-screen items-center justify-center bg-black p-4')}>
+      <Card className="bg-black text-white border border-gray-700 shadow-lg w-full max-w-sm p-6">
+        <CardHeader>
+          <CardTitle className="text-2xl">Doctor Login</CardTitle>
+          <CardDescription className="text-gray-400">
+            Enter your credentials below to login
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit}>
+            <div className="flex flex-col gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  name="username"
+                  placeholder="Enter username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                  className="w-full bg-black text-white border border-gray-600 focus:border-white focus:outline-none px-3 py-2 rounded-md"
+                />
+              </div>
 
-          Login
-        </button>
-        {/* </Link> */}
-        <p>New to website <Link to='/doctorRegister' className='text-black'>Register</Link></p>
-      </form>
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  name="password"
+                  placeholder="Enter password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className="w-full bg-black text-white border border-gray-600 focus:border-white focus:outline-none px-3 py-2 rounded-md"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-white text-black border border-white hover:bg-black hover:text-white transition-all duration-300"
+                disabled={loading}
+              >
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Login"}
+              </Button>
+
+              <div className="mt-4 text-center text-sm text-gray-400">
+                Don&apos;t have an account?{" "}
+                <Link to="/doctorRegister" className="underline">
+                  Register
+                </Link>
+              </div>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
 export default DoctorLogin;
+
