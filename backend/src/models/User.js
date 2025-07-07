@@ -18,6 +18,17 @@ const UserSchema=new mongoose.Schema({
     refreshToken: {
         type: String
     },
+    isSubscribed:{
+        type:Boolean,
+        default:false
+    },
+    razorpaySubscriptionId:{
+       type:String
+    },
+    subscriptionPlan:{
+       type:mongoose.Schema.Types.ObjectId,
+       ref:'SubscriptionPlan'
+    },
     email:{
        type:String,
        required:[true,"email is required"]
@@ -26,10 +37,6 @@ const UserSchema=new mongoose.Schema({
        type:mongoose.Schema.Types.ObjectId,
        ref:'Slot'
     }],
-    // Doctors:[{
-    //     type:mongoose.Schema.Types.ObjectId,
-    //     ref:'Slot'
-    // }]
 },{timestamps:true})
 
 UserSchema.pre("save", async function (next) {

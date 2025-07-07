@@ -31,13 +31,15 @@ const generateAccessAndRefreshTokens= async(doctorid)=>{
     }
 }
 
-const registerDoctor=asyncHandler(async(req,res)=>{
-    
-    const {name,username,password,email,qualification}=req.body;
+const registerDoctor=async(req,res)=>{
+    console.log("registeration starts",req.body);
+    const {name,email,qualification,username,password}=req.body;
 
     try{
+        console.log("registration start");
     if(!name || !username || !password || !email || !qualification){
-        throw new ApiError(400,"all fields required");
+        console.error("some error in fields");
+        return res.status(500).json({msg:"all fields required"});
     }
 
     
@@ -46,19 +48,20 @@ const registerDoctor=asyncHandler(async(req,res)=>{
     })
     // console.log(exist);
     if(exist){
-        throw new ApiError(500,"this account already exists");
+        console.error("this account already exists");
+        return res.status(400).json({msg:"this account already exists"});
     }
-
+    console.log("image is",req.file);
     const DoctorLocalPath = req.files?.DoctorPhoto[0]?.path;
     console.log("image is",DoctorLocalPath);
   if (!DoctorLocalPath) {
-    throw new ApiError(400, "image is required:");
+     return res.status(500).json({msg:"image is required"});
   }
 
   const DoctorPhoto = await uploadOnCloudinary(DoctorLocalPath);
   console.log(DoctorPhoto);
   if (!DoctorPhoto) {
-    throw new ApiError(500, "image cant be uploaded");
+     return res.status(500).json({msg:"image is not uploaded"});
   }
     const doctor=await Doctor.create({
         name,
@@ -66,60 +69,25 @@ const registerDoctor=asyncHandler(async(req,res)=>{
         password,
         email,
         image:DoctorPhoto.url,
-        qualification
+        qualification:qualification
     });
-
+    console.log("doctor is",doctor);
     const check=await Doctor.findById(doctor._id).select("-password -refreshToken");
 
     if(!check){
         throw new ApiError(500,"user has not been registered");
     }
 
-    const time1=new Date();
-    const time2=new Date();
-    time1.setHours(15,0,0);
-    time2.setHours(18,0,0);
+    console.log("user registered successfully",check);
 
-    const date1 = new Date(time1); 
-
-
-const time12 = date1.toLocaleTimeString('en-US', {
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit'
-});
-
-const date2 = new Date(time2); 
-
-
-const time21 = date2.toLocaleTimeString('en-US', {
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit'
-});
-
-    const Slot1=await Slot.create({
-        Doctor:doctor.id,
-        Time:time12,
-        price:250,
-        check:"available"
-    });
-    const updateDoctor1=await Doctor.findOneAndUpdate({_id:doctor._id},{$push:{DoctorSlot:Slot1._id}},{new:true});
-    const Slot2=await Slot.create({
-        Doctor:doctor.id,
-        Time:time21,
-        price:250,
-        check:"available"
-    });
-    const updateDoctor2=await Doctor.findOneAndUpdate({_id:doctor._id},{$push:{DoctorSlot:Slot2._id}},{new:true});
     return res.status(201).json(
-       {data:updateDoctor2,msg:"user registered successfully"}
+       {data:check,msg:"user registered successfully"}
     )
 }catch(err){
     console.error("some error in registering backend",err);
-    res.status(500).json({msg:"some error in registering backend"});
+    res.status(500).json({msg:`some error in registering backend ${err}`,err});
 }
-});
+};
 
 const LoginDoctor=asyncHandler(async(req,res)=>{
     
@@ -235,9 +203,9 @@ const SlotAttend=asyncHandler(async(req,res)=>{
      const doctor=req.doctor._id;
      console.log("doctor id",doctor);
      try{
-     const FindSlot=await Doctor.findById(doctor).populate('ToAttendSlot');
+     const FindSlot=await Doctor.findById(doctor).populate({path:'DoctorSlot',populate:[{path:'userId'},{path:'doctorId'}]});
      console.log("FindSlot",FindSlot);
-     return res.status(200).json({msg:"Slot fetched Successfully",data:FindSlot.ToAttendSlot});
+     return res.status(200).json({msg:"Slot fetched Successfully",data:FindSlot.DoctorSlot});
      }catch(err){
         console.error("some error is here",err);
      }
@@ -314,4 +282,16 @@ const DoctorBhai=asyncHandler(async(req,res)=>{
        }
 })
 
-export {registerDoctor,LoginDoctor,LogoutDoctor,refreshAccesToken,editDoctor,SlotAttend,FindDoctorById,AllDoctor,GetDoctorId,GetUser,DoctorBhai}
+const GetDoctorByUsername=asyncHandler(async(req,res)=>{    
+    const {username}=req.body;
+    try{
+    const FindDoctor=await Doctor.findOne({username:username});
+    console.log("FindDoctor is",FindDoctor);
+    return res.status(200).json({msg:"findDoctor by id FEtched successfully",data:FindDoctor});
+    }catch(err){
+        console.error(err);
+        return res.status(500).json({msg:"error in fetching DoctorById",err});
+    }
+})
+
+export {registerDoctor,LoginDoctor,LogoutDoctor,refreshAccesToken,editDoctor,SlotAttend,FindDoctorById,AllDoctor,GetDoctorId,GetUser,DoctorBhai,GetDoctorByUsername}

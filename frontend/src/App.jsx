@@ -23,6 +23,8 @@ import DoctorVideo from "./component/DoctorVideo"
 import UserAnalytics from "./Pages/DashBoard"
 import DoctorDashboard from "./Pages/DoctorDashboard"
 import AboutDoctor from "./Pages/AboutDoctor"
+import SubscriptionPage from "./Pages/SubscriptionPage"
+import { Toaster } from 'react-hot-toast'
 
 
 
@@ -53,6 +55,10 @@ function App() {
       path:'/UserHome',
       element:<UserAnalytics/>
     },
+    ,{
+      path:'/Subscription',
+      element:<SubscriptionPage/>
+    },
     {
       path:'/DoctorHome',
       element:<DoctorDashboard/>
@@ -60,12 +66,6 @@ function App() {
     {
       path:'/SeeDoctor',
       element:<FindDoctor/>,
-      // children:[
-      //   {
-      //     path:':username',
-      //     element:<SlotPage/>
-      //   }
-      // ]
     },
     {
       path:'/SeeDoctor/:username',
@@ -89,6 +89,7 @@ function App() {
 
   return (
     <>
+      <Toaster position="top-right" reverseOrder={false} />
       <SocketProvider>
       <PeerProvider>
       <DataProvider>

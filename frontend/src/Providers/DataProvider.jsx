@@ -35,6 +35,7 @@ export const DataProvider=({children})=>{
            console.log("value is",response.data.val);
            setIsAuth({valid:value.valid,role:value.role});
            console.log("isAuth is ",isAuth);
+           return response;
         }catch(error){
             console.error("error in login in frontend part",error);
         }
@@ -45,16 +46,30 @@ export const DataProvider=({children})=>{
            const value=response.data.val;
         //    setIsAuth({valid:value.valid,role:value.role});
         setIsAuth({valid: value.valid, role: value.role });
+        return response;
         }catch(error){
             console.error("error in login in frontend part",error);
         }
     }
+    // const RegisterDoctorGet=async(name,email,qualification,username,password)=>{
+    //     try {
+    //         const response=await axios.post("/api/v1/doctor/registerDoctor",{name,email,qualification,username,password},{withCredentials:true});
+    //         if(!response){
+    //             console.error("error in registering user try again");
+    //         }
+    //         console.log("response is",response);
+    //     } catch (error) {
+    //         console.error("error in registering the user try again",error);
+    //     }
+    // }
     const RegisterDoctorGet=async(data)=>{
         try {
             const response=await axios.post("/api/v1/doctor/registerDoctor",data,{withCredentials:true});
             if(!response){
                 console.error("error in registering user try again");
             }
+            console.log("response is",response);
+            return response
         } catch (error) {
             console.error("error in registering the user try again",error);
         }

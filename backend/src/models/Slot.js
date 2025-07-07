@@ -1,28 +1,26 @@
 import mongoose from "mongoose"
+import { type } from "os";
 
 const SlotSchema=new mongoose.Schema(
 {
-   Doctor:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Doctor"
+   userId:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"User"
    },
-   Time:{
+   doctorId:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"Doctor"
+   },
+   date:{
     type:String
    },
-   price:{
-    type:Number,
-    required:true
+   time:{
+    type:String
    },
-   Patient:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"User"
+   
+   paymentId:{
+    type:String
    },
-
-   check:{
-    type:String,
-    enum:["available","unavailable"],
-    default:"available"
-   }
 
    
 },{timestamps:true})

@@ -29,49 +29,104 @@ const generateAccessAndRefreshTokens= async(userid)=>{
     }
 }
 
-const registerUser=asyncHandler(async(req,res)=>{
-    
-    const {name,username,password,email}=req.body;
+// const registerUser=asyncHandler(async(req,res)=>{
+//     console.log("registeration starts",req.body);
+//     const {name,username,password,email}=req.body;
 
     
-    if(!name || !username || !password || !email){
-        throw new ApiError(400,"all fields required");
+//     if(!name){
+//         throw new ApiError(400,"all fields required name");
+//     }
+//     if(!username){
+//         throw new ApiError(400,"username is required");
+//     }
+//     if(!password){
+//         throw new ApiError(400,"password is required");
+//     }
+//     if(!email){
+//         throw new ApiError(400,"email is required");
+//     }
+    
+//     const exist=await User.findOne({
+//         $or:[{email},{username}]
+//     })
+//     console.log(exist);
+//     if(exist){
+//         throw new ApiError(400,"this account already exists");
+//     }
+
+    
+//     const user=await User.create({
+//         name,
+//         username,
+//         password,
+//         email
+//     });
+
+//     const check=await User.findById(user._id).select("-password -refreshToken");
+
+//     if(!check){
+//         throw new ApiError(500,"user has not been registered");
+//     }
+
+//     //return to database
+//     console.log("user registered successfully",check);
+//     return res.status(201).json(
+//        new ApiResponse(201,check,"user registered successfully")
+//     )
+// });
+const registerUser = asyncHandler(async (req, res) => {
+    try {
+        console.log("Registration starts", req.body);
+        const { name, username, password, email } = req.body;
+
+        if (!name || !username || !password || !email) {
+            throw new ApiError(400, "All fields are required: name, username, password, and email.");
+        }
+
+        const exist = await User.findOne({
+            $or: [{ email }, { username }]
+        });
+
+        if (exist) {
+            throw new ApiError(400, "An account with this email or username already exists.");
+        }
+
+        // Optionally hash the password here using bcrypt if not handled in User schema
+        // const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = await User.create({
+            name,
+            username,
+            password, // Use `hashedPassword` if hashing manually
+            email
+        });
+
+        // No need to re-fetch, just sanitize before sending
+        const userResponse = {
+            _id: user._id,
+            name: user.name,
+            username: user.username,
+            email: user.email
+        };
+
+        console.log("User registered successfully", userResponse);
+        return res.status(201).json(
+            new ApiResponse(201, userResponse, "User registered successfully")
+        );
+
+    } catch (error) {
+        console.error("Error in registration:", error);
+        throw error; // Let `asyncHandler` handle the thrown error
     }
-
-    
-    const exist=await User.findOne({
-        $or:[{email},{username}]
-    })
-    console.log(exist);
-    if(exist){
-        throw new ApiError(400,"this account already exists");
-    }
-
-    
-    const user=await User.create({
-        name,
-        username,
-        password,
-        email
-    });
-
-    const check=await User.findById(user._id).select("-password -refreshToken");
-
-    if(!check){
-        throw new ApiError(500,"user has not been registered");
-    }
-
-    //return to database
-    return res.status(201).json(
-       new ApiResponse(201,check,"user registered successfully")
-    )
 });
+
 
 const LoginUser=asyncHandler(async(req,res)=>{
     
     const {username,password}=req.body
- 
-    
+    console.log("logging in system");
+    console.log(req.body);
     if(!username || !password){
      console.log(req.body);
      throw new ApiError(401,"all details are missing");
@@ -81,7 +136,7 @@ const LoginUser=asyncHandler(async(req,res)=>{
     const exist=await User.findOne({
      $or:[{username}]
     })
- 
+    console.log("exist is",exist);
     if(!exist){
      throw new ApiError(500,"there is no account with this username or email please register first");
     }
@@ -107,7 +162,7 @@ const LoginUser=asyncHandler(async(req,res)=>{
         valid:true,
         role:"user"
     }
- 
+    console.log("logged in");
     return res.status(200)
     .cookie("accessToken",accessToken,options)
     .cookie("refreshToken",refreshToken,options)
@@ -181,7 +236,7 @@ const editUser=asyncHandler(async(req,res)=>{
 const FetchBookedSlot=asyncHandler(async(req,res)=>{
     const userId=req.user._id;
     try{
-      const findSlot=await User.findById(userId).populate('YourSlot');
+      const findSlot=await User.findById(userId).populate({path:'YourSlot',populate: [{ path: 'userId' },{ path: 'doctorId' }]});
     //   console.log("YourSlot backend",findSlot);
       return res.status(200).json({data:findSlot.YourSlot,msg:"fetched successfully"});
     }catch(err){

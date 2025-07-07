@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
+
 
 const DoctorRegister = () => {
   const navigate = useNavigate();
@@ -27,10 +29,12 @@ const DoctorRegister = () => {
     if (type === 'file') {
       setFormData({ ...formData, [name]: files[0] });
     } else {
+      console.log("name is",name);
+      console.log("value is",value);
       setFormData({ ...formData, [name]: value });
     }
   };
-
+  console.log("formData is",formData);
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = new FormData();
@@ -40,14 +44,27 @@ const DoctorRegister = () => {
     data.append('DoctorPhoto', formData.DoctorPhoto);
     data.append('username', formData.username);
     data.append('password', formData.password);
-
-    RegisterDoctorGet(data)
-      .then(() => {
-        navigate('/doctorLogin');
-      })
-      .catch((err) => {
-        console.log('Error in registering doctor', err);
-      });
+    
+    console.log("data is",data);
+    console.log("FormData content:");
+for (let pair of data.entries()) {
+  console.log(`${pair[0]}:`, pair[1]);
+}
+    try{
+    // await RegisterDoctorGet(formData.name,formData.email,formData.qualification,formData.username,formData.password)
+    const response=await RegisterDoctorGet(data);
+    console.log("response is",response);
+    if(response.status == 201 || response.status == 200){
+      toast.success("Doctor registered successfully!");
+      navigate('/doctorLogin');
+    }else{
+      toast.error("Error in registering doctor. Please try again.");
+      console.error("Error in registering doctor:", response.data);
+    }
+    }catch(err){
+      toast.error("Error in registering doctor. Please try again.");
+      console.error("error in registering doctor:",err);
+    }
   };
 
   return (

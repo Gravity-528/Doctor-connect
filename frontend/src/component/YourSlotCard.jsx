@@ -5,8 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 const YourSlotCard = ({ props }) => {
-  const date = new Date(props.Time);
-
+  const date = new Date(props.date);
+  console.log("props", props);
+  console.log("date", date);
   const timeStr = date.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
@@ -35,13 +36,13 @@ const YourSlotCard = ({ props }) => {
   return (
     <Card className="bg-black border border-white text-white p-6 max-w-sm mx-auto mt-6 shadow-xl">
       <CardContent>
-        <h2 className="text-2xl font-bold mb-2">Slot at {props.Time}</h2>
-        <p className="text-gray-400">{DoctorName.name}</p>
-        <p className="text-gray-500 mb-4">{DoctorName.qualification}</p>
-        <p className="text-gray-500 mb-4">{timeStr}</p>
+        <h2 className="text-2xl font-bold mb-2">Slot at {props.date}</h2>
+        <p className="text-gray-400">{props.doctorId.name}</p>
+        <p className="text-gray-500 mb-4">{props.doctorId.qualification}</p>
+        <p className="text-gray-500 mb-4">{props.time}</p>
 
         <Button className="w-full bg-white text-black hover:bg-gray-300 transition duration-300">
-          <Link to={`/YourSlot/${DoctorName.username}`}>Start Call</Link>
+          <Link to={`/YourSlot/${props.doctorId.username}`}>Start Call</Link>
         </Button>
       </CardContent>
     </Card>

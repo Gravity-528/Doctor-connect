@@ -93,6 +93,7 @@ const YourSlot = () => {
       const response = await axios.get("/api/v1/user/getSlot", {
         withCredentials: true,
       });
+      console.log("response is", response.data.data);
       setUserSlot(response.data.data);
     } catch (err) {
       console.error("Error fetching user slots:", err);

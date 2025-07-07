@@ -9,6 +9,10 @@ import { User } from "../models/User.js";
 import { Doctor } from "../models/Doctor.js";
 import {Queue, tryCatch} from "bullmq"
 import IORedis from "ioredis"
+import mongoose from "mongoose";
+import axios from "axios";
+import crypto from "crypto";
+import { SubscriptionPlan } from "../models/SubscriptionPlan.js";
 
 const redisBook = new IORedis(process.env.REDIS_URI, {
   maxRetriesPerRequest: null,
@@ -141,15 +145,11 @@ const unBookSlot=asyncHandler(async(req,res)=>{
     );
     const doctor=await Doctor.findByIdAndUpdate(
       doctorId,
-      {$pull:{ToAttendSlot:slotid}},
+      {$pull:{DoctorSlot:slotid}},
       {new:true}
     )
-
-    const finalSlot=await Slot.findByIdAndUpdate(
-      slotid,
-      {$set:{Patient:null,check:"available"}},
-      {new:true}
-    )
+    
+    const finalSlot = await Slot.findByIdAndDelete(slotid);
 
     return res.status(200).json({msg:"call ended successfully"});
   }catch(err){
@@ -173,13 +173,7 @@ const askSlot=asyncHandler(async(req,res)=>{
     }
 })
 
-// --------------------------------------------------------------REVAMP----------------------------------------------------------------------
-// const bookSlotTemp=(async(req,res)=>{
-//    const {DoctorId,date,time}=req.body
-//    if (!DoctorId || !date || !time) {
-//     return res.status(400).json({ message: "Missing required fields" });
-//   }
-//    const userId=req.user;
+
 
 //    const key=`temp${DoctorId}${date}${time}`
 //    try {
@@ -268,7 +262,7 @@ const askSlot=asyncHandler(async(req,res)=>{
 
     
 //     await redisBook.set(key, userId, "NX", "EX", 600);
-
+const base64Auth = Buffer.from(`${process.env.RAZORPAY_KEY_ID}:${process.env.RAZORPAY_KEY_SECRET}`).toString("base64");
 const bookSlotTemp = async (req, res) => {
   const { DoctorId, date, time } = req.body;
   if (!DoctorId || !date || !time) {
@@ -296,26 +290,45 @@ const bookSlotTemp = async (req, res) => {
       return res.status(409).json({ message: "Slot is temporarily locked. Try again later." });
     }
 
-    await redisBook.set(key, userId, "NX", "EX", 900);
+    await redisBook.set(key, userId, "NX", "EX", 1200);
     
     const expireBy=Math.floor(Date.now()/1000)+480;
 
-     const order=await razorpay.orders.create({
-       amount:200,
-       currency:"INR",
-       receipt:`order_${userId}`,
-       payment_capture:1,
-       expire_by:expireBy
-     })
+    //  const order=await razorpay.orders.create({
+    //    amount:200,
+    //    currency:"INR",
+    //    receipt:`order_${userId}`,
+    //    payment_capture:1,
+    //   //  expire_by:expireBy
+    //  })
+    //  Correct API Request to Razorpay
+    const response = await axios.post(
+      "https://api.razorpay.com/v1/orders",
+      {
+        amount: 20000, // ✅ Amount in paise (₹200)
+        currency: "INR",
+        receipt: `order_${userId}`,
+        payment_capture: 1,
+        // expire_by: expireBy,
+        notes: {type: "Booking", userId, DoctorId, date, time},
+      },
+      {
+        auth: {
+          username: process.env.RAZORPAY_KEY_ID,
+          password: process.env.RAZORPAY_KEY_SECRET,
+        },
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
     await session.commitTransaction();
     session.endSession();
     
 
-    return res.status(201).json({ message: "Slot booked successfully" });
+    return res.status(201).json({order:response.data, message: "Slot booked successfully"});
 
   } catch (error) {
-    await session.abortTransaction();
+    // await session.abortTransaction();
     session.endSession();
     await redisBook.del(key);
     console.error("Error in booking process:", error);
@@ -334,18 +347,24 @@ const razorpayWebhook = async (req, res) => {
   if (expectedSignature !== req.headers["x-razorpay-signature"]) {
     return res.status(400).json({ message: "Invalid signature" });
   }
-
+  console.log("expected key is",expectedSignature);
   const { event, payload } = req.body;
 
   if (event === "payment.captured") {
+    console.log("webhook is triggered");
     const paymentId = payload.payment.entity.id;
+    const type = payload.payment.entity.notes.type;
+    console.log("payload is",payload.payment.entity);
+    if(type==="Booking"){
+    console.log("Booking is triggered");
     const userId = payload.payment.entity.notes.userId;
     const DoctorId = payload.payment.entity.notes.DoctorId;
     const date = payload.payment.entity.notes.date;
     const time = payload.payment.entity.notes.time;
     
     const key = `temp${DoctorId}${date}${time}`;
-
+    console.log("key is",key);
+    console.log("redisBook is",redisBook);
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -359,16 +378,20 @@ const razorpayWebhook = async (req, res) => {
         await razorpayRefund(paymentId);
         return res.status(409).json({ message: "Slot expired. Refund initiated." });
       }
-
-      await Slot.create([{ userId, DoctorId, date, time, paymentId }], { session });
-
+      // console.log("doctorId is",DoctorId);
+      const slot=await Slot.create({ userId, doctorId:DoctorId, date, time, paymentId });
+      console.log("slot is ",slot);
+      const updateDoctor = await Doctor.findByIdAndUpdate(DoctorId, { $addToSet: { DoctorSlot: slot._id } }, {new:true });
+      const updateUser = await User.findByIdAndUpdate(userId, { $addToSet: { YourSlot: slot._id } }, {new:true });
+      console.log("updateDoctor is",updateDoctor);
+      console.log("updateUser is",updateUser);
       await session.commitTransaction();
       session.endSession();
 
       await redisBook.del(key);
 
       return res.status(200).json({ message: "Payment successful, slot booked" });
-
+    
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
@@ -376,10 +399,104 @@ const razorpayWebhook = async (req, res) => {
       return res.status(500).json({ message: "Internal server error" });
     }
   }
+  }
+  if (event === "subscription.activated") {
+    console.log("Subscription activated",req.body.payload.subscription);
+    const { entity } = req.body.payload.subscription;
+    const userId = entity.notes.userId; 
+    
+    const FindData=await SubscriptionPlan.findOne({SubscriptionId:entity.id});
+    await User.findOneAndUpdate(
+      { _id: userId }, 
+      { isSubscribed: true,subscriptionPlan:FindData._id, subscriptionStatus: "active" }
+    );
+  }
+  if(event==="subscription.cancelled"){
+    const {entity}=req.body.payload.subscription;
+    const userId=entity.notes.userId;
+
+    await User.findOneAndUpdate(
+      {_id:userId},
+      { isSubscribed: false,subscriptionStatus:"NotActive"}
+    )
+  }
+  if (event === "subscription.charged") {
+    console.log("payment is",req.body.payload);
+    console.log("userId payment is",req.body.payload.subscription.entity.notes.userId)
+    const findSub=await SubscriptionPlan.findOne({SubscriptionId:req.body.payload.subscription.entity.id});
+    if(findSub){
+      return res.status(400).json({message:"Subscription already charged"});
+    }
+    await SubscriptionPlan.create({
+      userId:req.body.payload.subscription.entity.notes.userId,
+      SubscriptionId:req.body.payload.subscription.entity.id,
+      paymentId:req.body.payload.payment.entity.id,
+      status:req.body.payload.subscription.entity.status
+    })
+  }
+  if (event === "subscription.halted" || event === "subscription.pending") {
+    await User.findOneAndUpdate(
+      { razorpaySubscriptionId: subscriptionId },
+      { isSubscribed: false, subscriptionStatus: "expired" }
+    );
+  }
 
   res.status(400).json({ message: "Unhandled event type" });
 };
 
+const CancelSubscription=( async (req, res) => {
+  const { userId } = req.body;
+
+  const user = await User.findById(userId);
+  if (!user || !user.razorpaySubscriptionId) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  try {
+    await razorpay.subscriptions.cancel(user.razorpaySubscriptionId);
+
+    
+    const daysRemaining = 30 - new Date().getDate(); 
+    const refundAmount = Math.round((daysRemaining / 30) * user.subscriptionAmount); 
+
+    
+    const paymentId = "pay_xxx"; 
+    await razorpay.payments.refund(paymentId, {
+      amount: refundAmount * 100, 
+    });
+
+    
+    await User.findByIdAndUpdate(userId, {
+      isSubscribed: false,
+      subscriptionStatus: "cancelled",
+    });
+
+    res.json({ message: "Subscription cancelled & refunded", refundAmount });
+  } catch (error) {
+    res.status(500).json({ message: "Error cancelling subscription", error });
+  }
+});
+
+
+const createSubscription = async (req, res) => {
+  try {
+    const { plan_id } = req.body; 
+    console.log("request id is",req.user)
+    const userId = req.user._id; 
+    
+    const subscription = await razorpay.subscriptions.create({ 
+      plan_id: plan_id,
+      customer_notify: 1,
+      total_count: 12, 
+      notes: { userId } 
+    });
+
+    res.json({ subscriptionId: subscription.id });
+  } catch (error) {
+    console.log("error is",error);
+    res.status(500).json({ error: "Subscription creation failed" });
+  }
+};
 
 const razorpayRefund = async (paymentId) => {
   try {
@@ -400,4 +517,15 @@ const razorpayRefund = async (paymentId) => {
   }
 };
 
-export {bookSlot,fetchSlot,unBookSlot,askSlot,bookSlotTemp,razorpayWebhook};
+const SubInfo=async(req,res)=>{
+  const {subscriptionId}=req.body;
+  try {
+    const subscription=await razorpay.subscriptions.fetch(subscriptionId);
+    return res.status(200).json({data:subscription});
+  } catch (error) {
+    console.log("error is",error);
+    return res.status(500).json({message:"some error is here"});
+  }
+}
+
+export {bookSlot,fetchSlot,unBookSlot,askSlot,bookSlotTemp,razorpayWebhook,createSubscription,CancelSubscription,SubInfo};

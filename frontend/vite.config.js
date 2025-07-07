@@ -5,7 +5,7 @@ import path from "path";
 export default defineConfig({
   server: {
     proxy: {
-      "/api": "https://doctor-connect-3backend.onrender.com",
+      "/api": "http://localhost:8000",
     },
   },
   resolve: {

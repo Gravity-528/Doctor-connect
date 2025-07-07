@@ -117,7 +117,7 @@ const DoctorVideo = () => {
           UnBookSlot();
 
           navigate('/DoctorHome')
-      },15*1000);
+      },40*60*1000);
    };
 
    const GetMessage = async (data) => {

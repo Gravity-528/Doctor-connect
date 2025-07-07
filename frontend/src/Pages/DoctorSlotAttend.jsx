@@ -20,6 +20,7 @@ const DoctorSlotAttend = () => {
       const OtherSlot = await axios.get("/api/v1/doctor/doctorSlot", {
         withCredentials: true,
       });
+      console.log("otherslot is", OtherSlot.data.data);
       setDoctorSlot(OtherSlot.data.data);
     } catch (err) {
       console.error("Error in fetching OtherSlot", err);
