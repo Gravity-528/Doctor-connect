@@ -488,7 +488,8 @@ const createSubscription = async (req, res) => {
       plan_id: plan_id,
       customer_notify: 1,
       total_count: 12, 
-      notes: { userId } 
+      notes: { userId } ,
+      start_at: Math.floor(Date.now() / 1000)
     });
 
     res.json({ subscriptionId: subscription.id });
