@@ -4,212 +4,169 @@ import { usePeer } from '../Providers/WebRTC';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useData } from '../Providers/DataProvider';
+import { Mic, MicOff, Video as VideoIcon, VideoOff, Phone, Monitor, StopCircle } from 'lucide-react';
 
 const Video = () => {
-   const navigate=useNavigate();
-   const {isAuth}=useData();
-   const {username}=useParams();
-   console.log("username route is",username);
-   // const {userById}=useData();
-   const [userById,setUserById]=useState([]);
-   console.log("isAuth is",isAuth);
-   const socket = useSocket();
-   console.log("your socket is",socket);
-   
-   const GetUserId=async()=>{
-      try {
-          const response=await axios.get('/api/v1/user/fetchById',{withCredentials:true});
-          console.log(response);
-          setUserById(response.data.data.username);
-          
-      } catch (error) {
-          console.error("some frontend error in fetching userById",error);
-      }
-  }
-   
-   const { peer, SendOffer, RecieveAnswer, getCam } = usePeer();
-   
-   
+  const navigate = useNavigate();
+  const { isAuth } = useData();
+  const { username } = useParams();
+  const [userById, setUserById] = useState([]);
+  const socket = useSocket();
 
-   const localVideoRef = useRef();
-   const remoteVideoRef = useRef();
-   const localStreamRef=useRef();
-   const remoteStreamRef=useRef();
+  const { peer, SendOffer, RecieveAnswer, getCam } = usePeer();
 
-   const [localStream, setLocalStream] = useState(null);
-   const [remoteStream, setRemoteStream] = useState(null);
+  const localVideoRef = useRef();
+  const remoteVideoRef = useRef();
+  const localStreamRef = useRef();
+  const remoteStreamRef = useRef();
 
-   const SendLocalStream = async () => {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-      setLocalStream(stream);
-      localStreamRef.current = stream;
-      if (localVideoRef.current) {
-         localVideoRef.current.srcObject = stream;
-      }
-      peer.addStream(stream);
-   };
+  const [localStream, setLocalStream] = useState(null);
+  const [remoteStream, setRemoteStream] = useState(null);
 
-   const SendMessage = async () => {
-      const offer = await SendOffer();
-      socket.emit('message', { type: 'create-Offer', sdp: offer,you:userById,other:username });
+  // Control states
+  const [audioEnabled, setAudioEnabled] = useState(true);
+  const [videoEnabled, setVideoEnabled] = useState(true);
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
+  const screenStreamRef = useRef();
 
-   //    setTimeout(()=>{
-   //       socket.emit('message',{type:'disconnect-peer',you:userById,other:username});
-   //       peer.close();
-   //       navigate('/UserHome')
-   //   },40*1000);
-   };
+  const GetUserId = async () => {
+    try {
+      const response = await axios.get('/api/v1/user/fetchById', { withCredentials: true });
+      setUserById(response.data.data.username);
+    } catch (error) {
+      console.error("frontend error fetching userById", error);
+    }
+  };
 
-   const GetMessage = async (data) => {
+  const SendLocalStream = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+    setLocalStream(stream);
+    localStreamRef.current = stream;
+    if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+    peer.addStream(stream);
+  };
+
+  const SendMessage = async () => {
+    const offer = await SendOffer();
+    socket.emit('message', { type: 'create-Offer', sdp: offer, you: userById, other: username });
+  };
+
+  const ReceiveVideo = (event) => {
+    if (!remoteStream) {
+      setRemoteStream(event.streams[0]);
+      remoteStreamRef.current = event.streams[0];
+      if (remoteVideoRef.current) remoteVideoRef.current.srcObject = event.streams[0];
+    }
+  };
+
+  const endCall = () => {
+    peer.close();
+    socket.emit("disconnect-peer", { you: userById, other: username });
+    localStreamRef.current?.getTracks().forEach(track => track.stop());
+    remoteStreamRef.current?.getTracks().forEach(track => track.stop());
+    if (localVideoRef.current) localVideoRef.current.srcObject = null;
+    if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
+    navigate('/UserHome');
+  };
+
+  const toggleAudio = () => {
+    localStreamRef.current?.getAudioTracks().forEach(t => t.enabled = !audioEnabled);
+    setAudioEnabled(!audioEnabled);
+  };
+
+  const toggleVideo = () => {
+    localStreamRef.current?.getVideoTracks().forEach(t => t.enabled = !videoEnabled);
+    setVideoEnabled(!videoEnabled);
+  };
+
+  const startScreenShare = async () => {
+    try {
+      const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      screenStreamRef.current = screenStream;
+      screenStream.getTracks().forEach(track => peer.addTrack(track, screenStream));
+      setIsScreenSharing(true);
+    } catch (err) {
+      console.error("Screen share failed:", err);
+    }
+  };
+
+  const stopScreenShare = () => {
+    const ss = screenStreamRef.current;
+    if (!ss) return;
+    ss.getTracks().forEach(t => t.stop());
+    setIsScreenSharing(false);
+  };
+
+  useEffect(() => {
+    GetUserId();
+    socket.emit("register", { you: userById });
+    
+    peer.onnegotiationneeded = SendMessage;
+    
+    socket.on('create-offer', async data => {
       await peer.setRemoteDescription(data);
       const answer = await RecieveAnswer();
-      socket.emit('message', { type: 'create-answer', sdp: answer,you:userById,other:username });
-   };
+      socket.emit('message', { type: 'create-answer', sdp: answer, you: userById, other: username });
+    });
+    
+    socket.on('create-answer', async data => {
+      await peer.setRemoteDescription(data);
+    });
 
-   const GetAnswer = async (data) => {
-      peer.setRemoteDescription(data);
-   };
-
-   const ReceiveVideo = (event) => {
-      if (!remoteStream) {
-         setRemoteStream(event.streams[0]);
-         remoteStreamRef.current=event.streams[0];
-         if (remoteVideoRef.current) {
-            remoteVideoRef.current.srcObject = event.streams[0];
-         }
+    SendLocalStream();
+    peer.ontrack = ReceiveVideo;
+    peer.onicecandidate = e => {
+      if (e.candidate) {
+        socket.emit("message", { type: "candidate", sdp: e.candidate, you: userById, other: username });
       }
-   };
-   useEffect(()=>{
-      socket.emit("register",{you:userById});
-   },[userById])
+    };
 
-   useEffect(() => {
+    socket.on("candidate", (data) => {
+      peer.addIceCandidate(new RTCIceCandidate(data.sdp)).catch(err => console.error("candidate error", err));
+    });
 
-      GetUserId();
-      peer.onnegotiationneeded = async () => {
-         const offer = await SendOffer();
-         socket.emit('message', { type: 'create-Offer', sdp: offer,you:userById,other:username });
-      };;
-      socket.on('create-offer', async (data) => {
-         console.log(data);
-         const {}=data;
-         await peer.setRemoteDescription(data);
-         const answer = await RecieveAnswer();
-         socket.emit('message', { type: 'create-answer', sdp: answer,you:userById,other:username });
-      });
-      socket.on('create-answer', async (data) => {
-         await peer.setRemoteDescription(data);
-      });
-      
-      SendLocalStream();
+    socket.on("disconnect-peer", endCall);
 
-      peer.ontrack = ReceiveVideo;
-      peer.onicecandidate = (event) => {
-         if (event.candidate) {
-            socket.emit("message", {type:"candidate", sdp: event.candidate, you: userById, other: username });
-         }
-      };
+    return () => {
+      socket.off('create-offer');
+      socket.off('create-answer');
+      socket.off('candidate');
+      socket.off('disconnect-peer');
+    };
+  }, [peer, socket, userById]);
 
-      socket.on("candidate", (data) => {
-         peer.addIceCandidate(new RTCIceCandidate(data.sdp))
-            .catch(err => console.error("Error adding received ICE candidate", err));
-      });
-      console.log("extra prev localStream",localStream);
-      console.log("extra prev remoteStream",remoteStream);
+  return (
+    <div className="bg-black h-screen flex flex-col items-center justify-center text-white">
+      <h1 className="text-4xl font-bold mb-6">Video Chat</h1>
 
-      socket.on("disconnect-peer",()=>{
-
-         console.log("userSocket is disconnecting for socket25sec");
-         console.log("prev localStreamRef",localStreamRef.current);
-          if (localStreamRef.current) {
-            // localStream.getTracks().forEach(track => track.stop()); 
-            localStreamRef.current.getTracks().forEach(track => track.stop());
-            localVideoRef.current.srcObject = null;
-            localStreamRef.current = null;
-            
-            console.log("prev localRef is",localVideoRef.current.srcObject);
-            setLocalStream(null);
-         
-         } 
-
-            console.log("prev remoteStreamRef",remoteStreamRef.current); 
-          if (remoteStreamRef.current) {
-            remoteStreamRef.current.getTracks().forEach(track => track.stop());  
-            remoteVideoRef.current.srcObject = null;
-            remoteStreamRef.current=null;
-            console.log("prev remoteRef is",remoteVideoRef.current.srcObject);
-            setRemoteStream(null);  
-         }
-
-         // if (localVideoRef.current) {
-         //    localVideoRef.current.srcObject = null;
-         // }
-         // if (remoteVideoRef.current) {
-         //    remoteVideoRef.current.srcObject = null;
-         // }
-         console.log("localStream is",localStream);
-         console.log("localStream ref is",localStreamRef.current);
-         console.log("remoteSRef is",remoteStreamRef.current);
-         console.log("RemoteStream is",remoteStream);
-         socket.off('create-offer', GetMessage);
-         socket.off('create-answer', GetAnswer);
-         peer.close();
-         navigate('/UserHome');
-      })
-      
-         return () => {
-            console.log("Cleaning up video streams and peer connection on unmount");
-            
-            console.log("cleanup localStream",localStream);
-            //  if (localStream) {
-            //     localStream.getTracks().forEach(track => track.stop());
-            //     localVideoRef.current.srcObject = null;
-            //    setLocalStream(null);
-            // }
-            console.log("cleanup remoteStream",remoteStream);
-            
-            // if (remoteStream) {
-            //     remoteStream.getTracks().forEach(track => track.stop());
-            //     remoteVideoRef.current.srcObject = null;
-            //     setRemoteStream(null);
-            // }
-            // if (localVideoRef.current) {
-            //    localVideoRef.current.srcObject = null;
-            // }
-            // if (remoteVideoRef.current) {
-            //    remoteVideoRef.current.srcObject = null;
-            // }
-            
-            // if (peer) {
-            //     peer.close();
-            // }
-            
-            socket.off('create-offer', GetMessage);
-            socket.off('create-answer', GetAnswer);
-        };
-         
-      
-   }, []);
-   console.log("localstream",localStream);
-   console.log("remoteStream",remoteStream);
-   return (
-      <div className="bg-gray-800 h-screen flex flex-col justify-center items-center text-white">
-         <h1 className="text-4xl font-bold mb-6">Video Chat</h1>
-         <p className="text-lg mb-8">Connect and start your video call!</p>
-         
-         <div className="flex space-x-8">
-            <video ref={localVideoRef} autoPlay muted className="w-72 h-40 bg-gray-700 rounded-md border border-white" />
-            <video ref={remoteVideoRef} autoPlay className="w-72 h-40 bg-gray-700 rounded-md border border-white" />
-         </div>
-         
-         {/* <div className="flex space-x-4 mt-8">
-            <button onClick={SendMessage} className="bg-blue-500 text-white px-6 py-3 rounded-md font-semibold hover:bg-blue-600 transition duration-300 ease-in-out">
-               Start Call
-            </button>
-         </div> */}
-         <div className="flex space-x-4 mt-8">Wait For Your Call</div>
+      <div className="flex space-x-8">
+        <video ref={localVideoRef} autoPlay muted className="w-80 h-56 bg-black rounded-md border border-white" />
+        <video ref={remoteVideoRef} autoPlay className="w-80 h-56 bg-black rounded-md border border-white" />
       </div>
-   );
+
+      <div className="flex space-x-4 mt-8">
+        <button onClick={toggleAudio} className="p-3 rounded-full border border-white hover:bg-white hover:text-black transition">
+          {audioEnabled ? <Mic /> : <MicOff />}
+        </button>
+        <button onClick={toggleVideo} className="p-3 rounded-full border border-white hover:bg-white hover:text-black transition">
+          {videoEnabled ? <VideoIcon /> : <VideoOff />}
+        </button>
+        {!isScreenSharing ? (
+          <button onClick={startScreenShare} className="p-3 rounded-full border border-white hover:bg-white hover:text-black transition">
+            <Monitor />
+          </button>
+        ) : (
+          <button onClick={stopScreenShare} className="p-3 rounded-full border border-white hover:bg-white hover:text-black transition">
+            <StopCircle />
+          </button>
+        )}
+        <button onClick={endCall} className="p-3 rounded-full border border-red-500 hover:bg-red-600 hover:text-white transition">
+          <Phone className="rotate-135"/>
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default Video;
+
