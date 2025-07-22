@@ -25,6 +25,7 @@ import DoctorDashboard from "./Pages/DoctorDashboard"
 import AboutDoctor from "./Pages/AboutDoctor"
 import SubscriptionPage from "./Pages/SubscriptionPage"
 import { Toaster } from 'react-hot-toast'
+import SubscriptionInfoPage from "./Pages/SubscriptionInfoPage"
 
 
 
@@ -84,6 +85,9 @@ function App() {
     },{
       path:'/DoctorSlot/:total',
       element:<DoctorVideo/>
+    },{
+      path:'/Profile',
+      element:<SubscriptionInfoPage/>
     }
   ]);
 

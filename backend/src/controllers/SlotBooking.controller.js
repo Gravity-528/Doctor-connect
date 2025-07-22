@@ -13,6 +13,7 @@ import mongoose from "mongoose";
 import axios from "axios";
 import crypto from "crypto";
 import { SubscriptionPlan } from "../models/SubscriptionPlan.js";
+import { type } from "os";
 
 const redisBook = new IORedis(process.env.REDIS_URI, {
   maxRetriesPerRequest: null,
@@ -349,7 +350,7 @@ const razorpayWebhook = async (req, res) => {
   }
   console.log("expected key is",expectedSignature);
   const { event, payload } = req.body;
-
+  console.log("payload",payload)
   if (event === "payment.captured") {
     console.log("webhook is triggered");
     const paymentId = payload.payment.entity.id;
@@ -404,21 +405,49 @@ const razorpayWebhook = async (req, res) => {
     console.log("Subscription activated",req.body.payload.subscription);
     const { entity } = req.body.payload.subscription;
     const userId = entity.notes.userId; 
-    
+    console.log("active userId is",userId);
+    console.log("active entity is",entity);
     const FindData=await SubscriptionPlan.findOne({SubscriptionId:entity.id});
+    console.log("active FindData is",FindData);
+    if(!FindData){
+      await SubscriptionPlan.create({
+      userId:req.body.payload.subscription.entity.notes.userId,
+      SubscriptionId:req.body.payload.subscription.entity.id,
+      paymentId:req.body.payload.payment.entity.id,
+      status:req.body.payload.subscription.entity.status
+    })
+    }
     await User.findOneAndUpdate(
       { _id: userId }, 
       { isSubscribed: true,subscriptionPlan:FindData._id, subscriptionStatus: "active" }
     );
   }
   if(event==="subscription.cancelled"){
-    const {entity}=req.body.payload.subscription;
-    const userId=entity.notes.userId;
+    if (event === "subscription.cancelled") {
+     const entity = payload.subscription.entity;
+     const userId = entity.notes.userId;
+     const subscriptionId = entity.id;
 
-    await User.findOneAndUpdate(
-      {_id:userId},
-      { isSubscribed: false,subscriptionStatus:"NotActive"}
-    )
+  // 1️⃣ Remove the SubscriptionPlan record
+  const deleted = await SubscriptionPlan.findOneAndDelete({
+    SubscriptionId: subscriptionId  // match by subscription.id, not _id
+  });
+
+  // 2️⃣ Update user document
+  const user = await User.findOneAndUpdate(
+    { _id: userId },
+    {
+      $set: { isSubscribed: false },
+      $unset: { subscriptionPlan: "" }  // removes the ObjectId reference
+    },
+    { new: true }
+  );
+
+  if (!user) {
+    console.warn("No user found for ID:", userId);
+  }
+}
+
   }
   if (event === "subscription.charged") {
     console.log("payment is",req.body.payload);
@@ -444,38 +473,90 @@ const razorpayWebhook = async (req, res) => {
   res.status(400).json({ message: "Unhandled event type" });
 };
 
-const CancelSubscription=( async (req, res) => {
-  const { userId } = req.body;
+// const CancelSubscription=( async (req, res) => {
+//   const { userId } = req.user._id;
+//   const Subscription= await SubscriptionPlan.findOne({userId:userId});
+//   if(!Subscription){
+//     return res.status(404).json({ message: "Subscription not found" });
+//   }
+//   const user = await User.findById(userId);
+//   if (!user || !user.razorpaySubscriptionId) {
+//     return res.status(404).json({ message: "User not found" });
+//   }
 
-  const user = await User.findById(userId);
-  if (!user || !user.razorpaySubscriptionId) {
-    return res.status(404).json({ message: "User not found" });
+//   try {
+//     await razorpay.subscriptions.cancel(user.razorpaySubscriptionId);
+
+    
+//     const daysRemaining = 30 - new Date().getDate(); 
+//     const refundAmount = Math.round((daysRemaining / 30) * user.subscriptionAmount); 
+
+    
+//     const paymentId = "pay_xxx"; 
+//     await razorpay.payments.refund(paymentId, {
+//       amount: refundAmount * 100, 
+//     });
+
+    
+//     await User.findByIdAndUpdate(userId, {
+//       isSubscribed: false,
+//       subscriptionStatus: "cancelled",
+//     });
+
+//     res.json({ message: "Subscription cancelled & refunded", refundAmount });
+//   } catch (error) {
+//     res.status(500).json({ message: "Error cancelling subscription", error });
+//   }
+// });
+
+const CancelSubscription = async (req, res) => {
+  const userId = req.user._id;
+
+  const subscription = await SubscriptionPlan.findOne({ userId });
+  if (!subscription?.SubscriptionId) {
+    return res.status(404).json({ message: "Subscription not found" });
   }
-
+  const subId = subscription.SubscriptionId;
+  console.log("subId is", subId);
   try {
-    await razorpay.subscriptions.cancel(user.razorpaySubscriptionId);
+    const inv = await razorpay.invoices.all({ subscription_id: subId });
+    const latest = inv.items[0];
+    console.log("latest invoice is", latest);
+    console.log("invoice items are", inv.items);
+    if (!latest?.payment_id) {
+      return res.status(400).json({ message: "No valid payment found for refund" });
+    }
+    const paymentId = latest.payment_id;
+    console.log("paymentId is", paymentId);
+    const canceled = await razorpay.subscriptions.cancel(subId, { cancel_at_cycle_end: true });
+    // const canceled = await razorpay.subscriptions.cancel(subId);
+    console.log("canceled subscription is", canceled);
+    const plan = await razorpay.plans.fetch(canceled.plan_id);
+    const cycleAmount = plan.item.amount;
+    const cycleEndMs = canceled.current_end * 1000;
 
-    
-    const daysRemaining = 30 - new Date().getDate(); 
-    const refundAmount = Math.round((daysRemaining / 30) * user.subscriptionAmount); 
+    const daysLeft = Math.max(0, (cycleEndMs - Date.now()) / (1000 * 60 * 60 * 24));
+    const refundPaise = Math.round((daysLeft / 30) * cycleAmount);
 
-    
-    const paymentId = "pay_xxx"; 
-    await razorpay.payments.refund(paymentId, {
-      amount: refundAmount * 100, 
+    let refundId = null;
+    if (refundPaise > 0) {
+      const refund = await razorpay.payments.refund(paymentId, { amount: refundPaise });
+      refundId = refund.id;
+    }
+
+    return res.json({
+      message: "Subscription canceled",
+      status: canceled.status,
+      cycleEndsAt: cycleEndMs,
+      refundAmount: refundPaise / 100,
+      refundId
     });
 
-    
-    await User.findByIdAndUpdate(userId, {
-      isSubscribed: false,
-      subscriptionStatus: "cancelled",
-    });
-
-    res.json({ message: "Subscription cancelled & refunded", refundAmount });
-  } catch (error) {
-    res.status(500).json({ message: "Error cancelling subscription", error });
+  } catch (err) {
+    console.error("Error in cancelSubscription:", err);
+    return res.status(500).json({ message: "Error canceling subscription", error: err.message });
   }
-});
+};
 
 
 const createSubscription = async (req, res) => {
@@ -489,7 +570,6 @@ const createSubscription = async (req, res) => {
       customer_notify: 1,
       total_count: 12, 
       notes: { userId } ,
-      start_at: Math.floor(Date.now() / 1000)
     });
 
     res.json({ subscriptionId: subscription.id });
@@ -529,4 +609,33 @@ const SubInfo=async(req,res)=>{
   }
 }
 
-export {bookSlot,fetchSlot,unBookSlot,askSlot,bookSlotTemp,razorpayWebhook,createSubscription,CancelSubscription,SubInfo};
+const GetSubInfo=async(req,res)=>{
+  const userId=req.user._id
+  console.log("userId is",userId);
+  const subscription=await SubscriptionPlan.findOne({userId:userId});
+  console.log("subscription is",subscription);
+  const SubscriptionId=subscription?.SubscriptionId;
+  if(!SubscriptionId || subscription.status!=="active"){
+    return res.status(200).json({message:"Subscription not found renew your subscription",type:"NotActive"});
+  }
+
+  const sub = await razorpay.subscriptions.fetch(SubscriptionId);
+  const plan = await razorpay.plans.fetch(sub.plan_id);
+
+  res.json({
+    message: "Subscription details fetched successfully",
+    type: "Active",
+      subscription: {
+      planId: sub.plan_id,
+      status: sub.status,
+      paidCount: sub.paid_count,
+      totalCount: sub.total_count,
+      nextBilling: sub.charge_at * 1000,
+      currentEnd: sub.current_end * 1000,
+      amountPaid: (sub.paid_count || 0) * (plan.item.amount || 0),
+  }
+});
+
+}
+
+export {bookSlot,fetchSlot,unBookSlot,askSlot,bookSlotTemp,razorpayWebhook,createSubscription,CancelSubscription,SubInfo,GetSubInfo};
